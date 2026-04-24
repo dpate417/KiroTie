@@ -259,5 +259,107 @@ def send_email():
 
     return jsonify(result)
 
+
+@app.route("/api/bulk-email", methods=["POST"])
+def bulk_email():
+    """
+    Accept a student CSV/Excel file.
+    Generate personalized insights + email for each student.
+    Send emails to all of them automatically.
+    """
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    filename = file.filename.lower()
+
+    try:
+        if filename.endswith(".csv"):
+            students = _parse_csv(file)
+        elif filename.endswith(".xlsx") or filename.endswith(".xls"):
+            students = _parse_excel(file)
+        else:
+            return jsonify({"error": "Only CSV or Excel files supported"}), 400
+    except Exception as e:
+        return jsonify({"error": f"Could not parse file: {str(e)}"}), 400
+
+    results = []
+    sent = 0
+    failed = 0
+    skipped = 0
+
+    for i, student in enumerate(students):
+        email = student.get("email", "").strip()
+        name = student.get("student_name", f"Student {i+1}")
+
+        if not email or "@" not in email:
+            results.append({
+                "name": name, "email": email or "missing",
+                "status": "SKIPPED", "reason": "No valid email address"
+            })
+            skipped += 1
+            continue
+
+        # Generate personalized insights for this student
+        insights = get_student_insights(student)
+        email_body = insights.get("email_preview", "")
+
+        if not email_body:
+            results.append({
+                "name": name, "email": email,
+                "status": "SKIPPED", "reason": "Could not generate email content"
+            })
+            skipped += 1
+            continue
+
+        # Extract subject from first line
+        first_line = email_body.split("\n")[0]
+        subject = first_line.replace("Subject: ", "").strip()
+        if not subject:
+            subject = f"EventWise Reminder — {student.get('event_name', 'Upcoming Event')}"
+
+        # Send the email
+        result = send_reminder_email(email, subject, plain_text=email_body)
+
+        if result["status"] == "SENT":
+            sent += 1
+            results.append({
+                "name": name,
+                "email": email,
+                "event": student.get("event_name", ""),
+                "likelihood": insights["attendance_likelihood"]["score"],
+                "likelihood_label": insights["attendance_likelihood"]["label"],
+                "warnings": len(insights.get("warnings", [])),
+                "status": "SENT"
+            })
+        else:
+            failed += 1
+            results.append({
+                "name": name, "email": email,
+                "status": "FAILED",
+                "reason": result.get("reason", "Unknown error")
+            })
+
+    return jsonify({
+        "summary": {
+            "total": len(students),
+            "sent": sent,
+            "failed": failed,
+            "skipped": skipped
+        },
+        "results": results
+    })
+
+
+@app.route("/api/student-dataset-sample")
+def download_student_sample():
+    return send_file(
+        os.path.join(os.path.dirname(__file__), "data", "sample_students.csv"),
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name="sample_students.csv"
+    )
+
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -233,6 +233,60 @@
     </div>
   </div>
 
+  <!-- BULK EMAIL SECTION -->
+  <div class="bulk-email-section">
+    <div class="bulk-email-header">
+      <h2>📨 Bulk Student Email</h2>
+      <p>Upload a student CSV — EventWise generates a personalized email for each student and sends them all automatically</p>
+    </div>
+
+    <div class="bulk-email-layout">
+      <div class="bulk-upload-box">
+        <div class="bulk-format">
+          <strong>Required CSV columns:</strong>
+          <code>student_name, email, event_name, event_time, event_location, last_class_end_time, last_class_location, distance_miles, student_major, event_topic, interest_match_score, past_attended, past_no_shows, day_of_week, registration_days_ago</code>
+        </div>
+        <a href="/api/student-dataset-sample" class="btn btn-secondary" style="margin-bottom:0.75rem">
+          ⬇️ Download Sample Student CSV
+        </a>
+        <div class="upload-area" id="bulkUploadArea">
+          <div class="upload-icon">📂</div>
+          <div class="upload-title">Drop student CSV here or click to browse</div>
+          <input type="file" id="bulkFileInput" accept=".csv,.xlsx,.xls" style="display:none"/>
+        </div>
+        <button class="btn btn-primary btn-full" id="bulkSendBtn" onclick="sendBulkEmails()" disabled>
+          📨 Generate &amp; Send All Emails
+        </button>
+      </div>
+
+      <div id="bulkResults" style="display:none">
+        <div class="gate-badge" id="bulkStatusBadge"></div>
+        <div class="result-card" style="margin-top:1rem">
+          <h3>📊 Bulk Send Results</h3>
+          <div class="bulk-summary-row" id="bulkEmailSummary"></div>
+        </div>
+        <div class="result-card" style="margin-top:1rem">
+          <h3>📋 Per-Student Results</h3>
+          <div class="table-wrap">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Email</th>
+                  <th>Event</th>
+                  <th>Likelihood</th>
+                  <th>Warnings</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="bulkEmailTable"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="/static/js/student.js"></script>
 </body>
 </html>

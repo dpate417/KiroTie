@@ -1,0 +1,6 @@
+student_name,email,event_name,event_time,event_location,last_class_end_time,last_class_location,distance_miles,student_major,event_topic,interest_match_score,past_attended,past_no_shows,attendance_streak,day_of_week,registration_days_ago
+Dhruv Patel,dpate417@asu.edu,UI/UX Design Workshop,16:15,Memorial Union,15:50,ENGR A,0.4,Computer Science,UI/UX Design,0.9,5,1,3,thursday,1
+Sarah Johnson,dpate417@asu.edu,CS Cybersecurity Night,18:00,Brickyard 340,17:30,BYAC,0.3,Computer Science,Cybersecurity,0.95,8,0,5,tuesday,2
+Marcus Lee,dpate417@asu.edu,Career Networking Mixer,17:00,MU Ballroom,16:50,COOR,0.5,Business,Networking,0.7,3,2,1,wednesday,7
+Priya Sharma,dpate417@asu.edu,Data Science Workshop,15:30,BYENG 210,14:50,ENGR A,0.4,Data Science,Machine Learning,0.85,6,1,4,thursday,1
+Alex Rivera,dpate417@asu.edu,Spring Club Fair,12:00,MU Courtyard,11:45,COOR,0.3,Psychology,Social Events,0.5,2,3,0,friday,14

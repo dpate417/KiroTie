@@ -188,3 +188,104 @@ function showEmailStatus(type, message) {
   div.className = type === "success" ? "email-status-ok" : "email-status-err";
   div.textContent = message;
 }
+
+// ===== BULK EMAIL UPLOAD =====
+const bulkArea = document.getElementById("bulkUploadArea");
+const bulkInput = document.getElementById("bulkFileInput");
+let bulkFile = null;
+
+if (bulkArea) {
+  bulkArea.addEventListener("click", () => bulkInput.click());
+  bulkArea.addEventListener("dragover", e => { e.preventDefault(); bulkArea.classList.add("dragover"); });
+  bulkArea.addEventListener("dragleave", () => bulkArea.classList.remove("dragover"));
+  bulkArea.addEventListener("drop", e => {
+    e.preventDefault();
+    bulkArea.classList.remove("dragover");
+    if (e.dataTransfer.files[0]) setBulkFile(e.dataTransfer.files[0]);
+  });
+  bulkInput.addEventListener("change", () => {
+    if (bulkInput.files[0]) setBulkFile(bulkInput.files[0]);
+  });
+}
+
+function setBulkFile(file) {
+  bulkFile = file;
+  bulkArea.innerHTML = `<div class="upload-filename">📄 ${file.name} (${(file.size/1024).toFixed(1)} KB) — Ready</div>`;
+  document.getElementById("bulkSendBtn").disabled = false;
+}
+
+async function sendBulkEmails() {
+  if (!bulkFile) return;
+  const btn = document.getElementById("bulkSendBtn");
+  btn.textContent = "📨 Sending...";
+  btn.disabled = true;
+
+  const formData = new FormData();
+  formData.append("file", bulkFile);
+
+  try {
+    const res = await fetch("/api/bulk-email", { method: "POST", body: formData });
+    const data = await res.json();
+    if (!res.ok) { alert("Error: " + (data.error || "Unknown")); return; }
+    renderBulkEmailResults(data);
+  } catch (err) {
+    alert("Something went wrong. Please try again.");
+  } finally {
+    btn.textContent = "📨 Generate & Send All Emails";
+    btn.disabled = false;
+  }
+}
+
+function renderBulkEmailResults(data) {
+  const panel = document.getElementById("bulkResults");
+  panel.style.display = "block";
+
+  // Badge
+  const badge = document.getElementById("bulkStatusBadge");
+  const allSent = data.summary.failed === 0 && data.summary.skipped === 0;
+  badge.className = allSent ? "gate-badge" : "gate-badge blocked";
+  badge.textContent = allSent
+    ? `✅ All ${data.summary.sent} emails sent successfully`
+    : `📨 ${data.summary.sent} sent · ${data.summary.failed} failed · ${data.summary.skipped} skipped`;
+
+  // Summary cards
+  document.getElementById("bulkEmailSummary").innerHTML = `
+    <div class="bulk-stat">
+      <div class="bulk-stat-num">${data.summary.total}</div>
+      <div class="bulk-stat-label">Students processed</div>
+    </div>
+    <div class="bulk-stat">
+      <div class="bulk-stat-num green">${data.summary.sent}</div>
+      <div class="bulk-stat-label">Emails sent</div>
+    </div>
+    <div class="bulk-stat">
+      <div class="bulk-stat-num" style="color:#f87171">${data.summary.failed + data.summary.skipped}</div>
+      <div class="bulk-stat-label">Failed / skipped</div>
+    </div>
+  `;
+
+  // Per-student table
+  document.getElementById("bulkEmailTable").innerHTML = data.results.map(r => {
+    if (r.status === "SENT") {
+      const lClass = r.likelihood >= 70 ? "badge-high" : r.likelihood >= 45 ? "badge-medium" : "badge-low";
+      const warnBadge = r.warnings > 0 ? `<span style="color:#f59e0b">⚠️ ${r.warnings}</span>` : `<span style="color:#4ade80">✅ None</span>`;
+      return `<tr>
+        <td><strong>${r.name}</strong></td>
+        <td style="color:#6b7280;font-size:0.8rem">${r.email}</td>
+        <td>${r.event}</td>
+        <td class="${lClass}">${r.likelihood}% ${r.likelihood_label}</td>
+        <td>${warnBadge}</td>
+        <td style="color:#4ade80;font-weight:600">✅ Sent</td>
+      </tr>`;
+    } else {
+      return `<tr>
+        <td><strong>${r.name}</strong></td>
+        <td style="color:#6b7280;font-size:0.8rem">${r.email}</td>
+        <td colspan="3" style="color:#f87171;font-size:0.8rem">${r.reason || r.status}</td>
+        <td style="color:#f87171;font-weight:600">❌ ${r.status}</td>
+      </tr>`;
+    }
+  }).join("");
+
+  panel.scrollIntoView({ behavior: "smooth" });
+}

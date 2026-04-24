@@ -243,3 +243,14 @@ code { background: #0f1117; padding: 0.1rem 0.4rem; border-radius: 4px; font-siz
 .email-input:focus { outline: none; border-color: #6366f1; }
 .email-status-ok { margin-top: 0.6rem; padding: 0.5rem 0.75rem; background: #052e16; border: 1px solid #16a34a; border-radius: 6px; color: #4ade80; font-size: 0.82rem; }
 .email-status-err { margin-top: 0.6rem; padding: 0.5rem 0.75rem; background: #450a0a; border: 1px solid #dc2626; border-radius: 6px; color: #f87171; font-size: 0.82rem; }
+
+/* ===== BULK EMAIL SECTION ===== */
+.bulk-email-section { max-width: 1200px; margin: 2rem auto; padding: 0 2rem 3rem; }
+.bulk-email-header { margin-bottom: 1.5rem; }
+.bulk-email-header h2 { font-size: 1.5rem; margin-bottom: 0.4rem; }
+.bulk-email-header p { color: #6b7280; font-size: 0.88rem; }
+.bulk-email-layout { display: grid; grid-template-columns: 380px 1fr; gap: 2rem; align-items: start; }
+@media (max-width: 900px) { .bulk-email-layout { grid-template-columns: 1fr; } }
+.bulk-upload-box { background: #1a1d27; border: 1px solid #2d3148; border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.bulk-format { background: #0f1117; border-radius: 8px; padding: 0.75rem; font-size: 0.75rem; color: #6b7280; line-height: 1.8; }
+.bulk-format code { display: block; color: #a5b4fc; font-size: 0.7rem; margin-top: 0.3rem; word-break: break-all; }
