@@ -186,6 +186,17 @@
         <h3>✉️ Personalized Email Preview</h3>
         <p class="reminders-sub">This is what EventWise sends — schedule-aware, interest-aligned, not generic</p>
         <div class="email-preview" id="emailPreview"></div>
+
+        <!-- Send Email Section -->
+        <div class="send-email-section">
+          <div class="send-email-row">
+            <input type="email" id="recipientEmail" placeholder="Enter student email to send this..." class="email-input"/>
+            <button class="btn btn-primary" id="sendEmailBtn" onclick="sendEmail()">
+              📤 Send Email
+            </button>
+          </div>
+          <div id="emailStatus" style="display:none"></div>
+        </div>
       </div>
 
       <!-- Cancellation prompt -->

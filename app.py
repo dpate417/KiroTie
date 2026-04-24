@@ -3,9 +3,23 @@ from engine.predictor import predict_attendance
 from engine.economics import calculate_waste_cost
 from engine.gate import transparency_gate
 from engine.student import get_student_insights
+from engine.mailer import send_reminder_email
 import csv
 import io
 import os
+
+# Load .env file if it exists
+def _load_env():
+    env_path = os.path.join(os.path.dirname(__file__), ".env")
+    if os.path.exists(env_path):
+        with open(env_path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    k, v = line.split("=", 1)
+                    os.environ.setdefault(k.strip(), v.strip())
+
+_load_env()
 
 app = Flask(__name__)
 
@@ -222,6 +236,28 @@ def student_insights():
     data = request.get_json()
     insights = get_student_insights(data)
     return jsonify(insights)
+
+
+@app.route("/api/send-email", methods=["POST"])
+def send_email():
+    """
+    Send a personalized reminder email to a student.
+    Body: { to_email, subject, email_body }
+    """
+    data = request.get_json()
+    to_email = data.get("to_email", "").strip()
+    subject = data.get("subject", "EventWise Reminder")
+    email_body = data.get("email_body", "")
+
+    if not email_body:
+        return jsonify({"status": "ERROR", "reason": "No email content provided"}), 400
+
+    result = send_reminder_email(to_email, subject, email_body)
+
+    if result["status"] == "ERROR":
+        return jsonify(result), 400
+
+    return jsonify(result)
 
 if __name__ == "__main__":
     app.run(debug=True)

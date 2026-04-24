@@ -235,3 +235,11 @@ code { background: #0f1117; padding: 0.1rem 0.4rem; border-radius: 4px; font-siz
 
 /* ===== IMPACT TABLE CARD ===== */
 .impact-card { border-color: #22c55e; }
+
+/* ===== SEND EMAIL ===== */
+.send-email-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #2d3148; }
+.send-email-row { display: flex; gap: 0.5rem; }
+.email-input { flex: 1; background: #0f1117; border: 1px solid #2d3148; border-radius: 8px; padding: 0.6rem 0.8rem; color: #e2e8f0; font-size: 0.88rem; }
+.email-input:focus { outline: none; border-color: #6366f1; }
+.email-status-ok { margin-top: 0.6rem; padding: 0.5rem 0.75rem; background: #052e16; border: 1px solid #16a34a; border-radius: 6px; color: #4ade80; font-size: 0.82rem; }
+.email-status-err { margin-top: 0.6rem; padding: 0.5rem 0.75rem; background: #450a0a; border: 1px solid #dc2626; border-radius: 6px; color: #f87171; font-size: 0.82rem; }

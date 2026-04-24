@@ -75,7 +75,8 @@ function renderStudentResults(data) {
       pattern_warning: "📊",
       logistics: "🗺️",
       reminder: "🔔",
-      streak: "🔥"
+      streak: "🔥",
+      interest: "🎯"
     };
     insightsList.innerHTML = data.insights.map(i =>
       `<div class="insight-item">
@@ -111,6 +112,10 @@ function renderStudentResults(data) {
   const emailPreview = document.getElementById("emailPreview");
   if (data.email_preview) {
     emailPreview.textContent = data.email_preview;
+    currentEmailBody = data.email_preview;
+    // Extract subject line
+    const subjectLine = data.email_preview.split("\n")[0];
+    currentEmailSubject = subjectLine.replace("Subject: ", "").trim();
   }
 
   // Cancellation prompt
@@ -128,4 +133,58 @@ function renderStudentResults(data) {
 
 function handleCancel() {
   alert("✅ Your spot has been canceled. The organizer has been notified and can plan more accurately. Thank you!");
+}
+
+// ===== SEND EMAIL =====
+let currentEmailBody = "";
+let currentEmailSubject = "";
+
+async function sendEmail() {
+  const toEmail = document.getElementById("recipientEmail").value.trim();
+  const btn = document.getElementById("sendEmailBtn");
+  const statusDiv = document.getElementById("emailStatus");
+
+  if (!toEmail) {
+    showEmailStatus("error", "Please enter a recipient email address.");
+    return;
+  }
+  if (!currentEmailBody) {
+    showEmailStatus("error", "Generate a student check first before sending.");
+    return;
+  }
+
+  btn.textContent = "📤 Sending...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch("/api/send-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        to_email: toEmail,
+        subject: currentEmailSubject,
+        email_body: currentEmailBody
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.status === "SENT") {
+      showEmailStatus("success", `✅ Email sent to ${toEmail}`);
+    } else {
+      showEmailStatus("error", `❌ ${data.reason}`);
+    }
+  } catch (err) {
+    showEmailStatus("error", "❌ Network error. Check the server is running.");
+  } finally {
+    btn.textContent = "📤 Send Email";
+    btn.disabled = false;
+  }
+}
+
+function showEmailStatus(type, message) {
+  const div = document.getElementById("emailStatus");
+  div.style.display = "block";
+  div.className = type === "success" ? "email-status-ok" : "email-status-err";
+  div.textContent = message;
 }
