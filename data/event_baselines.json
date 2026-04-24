@@ -1,14 +1,14 @@
 {
   "event_types": {
     "food_social": {
-      "base_show_rate": 0.72,
-      "description": "Food/social events",
+      "base_show_rate": 0.60,
+      "description": "Food/social events — free campus events avg 40-50% no-show (appendment.com, tixfox.co)",
       "avg_cost_per_person": 18,
       "avg_food_waste_lbs_per_person": 0.75
     },
     "academic_workshop": {
       "base_show_rate": 0.65,
-      "description": "Academic workshops / lectures",
+      "description": "Academic workshops / lectures — avg in-person attendance 68% (nunify.com)",
       "avg_cost_per_person": 8,
       "avg_food_waste_lbs_per_person": 0.3
     },
@@ -20,12 +20,12 @@
     },
     "club_meeting": {
       "base_show_rate": 0.55,
-      "description": "Club / org meetings",
+      "description": "Club / org meetings — 1-in-3 students spends zero time on extracurriculars (insidehighered.com)",
       "avg_cost_per_person": 5,
       "avg_food_waste_lbs_per_person": 0.4
     },
     "general": {
-      "base_show_rate": 0.62,
+      "base_show_rate": 0.60,
       "description": "General campus event",
       "avg_cost_per_person": 10,
       "avg_food_waste_lbs_per_person": 0.5

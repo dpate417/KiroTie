@@ -1,3 +1,12 @@
+const sInterest = document.getElementById("s_interest_match");
+const sInterestLabel = document.getElementById("s_interest_label");
+if (sInterest) {
+  sInterest.addEventListener("input", () => {
+    const v = parseFloat(sInterest.value);
+    sInterestLabel.textContent = v >= 0.7 ? "High" : v >= 0.4 ? "Medium" : "Low";
+  });
+}
+
 document.getElementById("studentForm").addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -12,7 +21,10 @@ document.getElementById("studentForm").addEventListener("submit", async (e) => {
     past_attended: parseInt(document.getElementById("s_past_attended").value) || 0,
     past_no_shows: parseInt(document.getElementById("s_past_no_shows").value) || 0,
     attendance_streak: parseInt(document.getElementById("s_streak").value) || 0,
-    registration_days_ago: parseInt(document.getElementById("s_reg_days_ago").value) || 1
+    registration_days_ago: parseInt(document.getElementById("s_reg_days_ago").value) || 1,
+    interest_match_score: parseFloat(document.getElementById("s_interest_match").value) || 0.5,
+    student_major: document.getElementById("s_student_major").value,
+    event_topic: document.getElementById("s_event_topic").value
   };
 
   try {
@@ -85,14 +97,21 @@ function renderStudentResults(data) {
     streakSection.style.display = "none";
   }
 
-  // Reminders
+  // Reminders — 3 stage
   const remindersList = document.getElementById("remindersList");
+  const reminderIcons = { interest: "🎯", schedule: "📅", logistics: "📍" };
   remindersList.innerHTML = data.reminders.map(r =>
     `<div class="reminder-item">
-      <span class="reminder-time">${r.timing}</span>
+      <span class="reminder-time">${reminderIcons[r.type] || "🔔"} ${r.timing}</span>
       <span>${r.message}</span>
     </div>`
   ).join("");
+
+  // Email preview
+  const emailPreview = document.getElementById("emailPreview");
+  if (data.email_preview) {
+    emailPreview.textContent = data.email_preview;
+  }
 
   // Cancellation prompt
   const cancelSection = document.getElementById("cancelSection");

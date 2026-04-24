@@ -35,10 +35,32 @@
           <input type="text" id="s_event_name" placeholder="e.g. CS Club Networking Night" value="CS Club Networking Night"/>
         </div>
 
+        <div class="form-group">
+          <label>Student Major / Field</label>
+          <input type="text" id="s_student_major" placeholder="e.g. Computer Science" value="Computer Science"/>
+        </div>
+
+        <div class="form-group">
+          <label>Event Topic</label>
+          <input type="text" id="s_event_topic" placeholder="e.g. UI/UX Design, Cybersecurity" value="UI/UX Design"/>
+        </div>
+
+        <div class="form-group">
+          <label>Interest Match</label>
+          <div class="slider-row">
+            <input type="range" id="s_interest_match" min="0" max="1" step="0.1" value="0.8"/>
+            <span id="s_interest_label">High</span>
+          </div>
+          <div class="slider-hints">
+            <span>Low (random signup)</span>
+            <span>High (target audience)</span>
+          </div>
+        </div>
+
         <div class="form-row">
           <div class="form-group">
             <label>Event Start Time</label>
-            <input type="time" id="s_event_time" value="16:00"/>
+            <input type="time" id="s_event_time" value="16:15"/>
           </div>
           <div class="form-group">
             <label>Day of Week</label>
@@ -152,11 +174,18 @@
         </div>
       </div>
 
-      <!-- Reminders -->
+      <!-- Reminders — 3 stage -->
       <div class="result-card reminders-card">
-        <h3>🔔 Smart Reminders</h3>
-        <p class="reminders-sub">EventWise will send these reminders on the day of the event:</p>
+        <h3>🔔 3-Stage Smart Reminders</h3>
+        <p class="reminders-sub">Personalized reminders boost attendance by 30–50% vs generic messages <span style="color:#4b5563;font-size:0.72rem">(instantly.ai)</span></p>
         <div id="remindersList"></div>
+      </div>
+
+      <!-- Personalized Email Preview -->
+      <div class="result-card email-card">
+        <h3>✉️ Personalized Email Preview</h3>
+        <p class="reminders-sub">This is what EventWise sends — schedule-aware, interest-aligned, not generic</p>
+        <div class="email-preview" id="emailPreview"></div>
       </div>
 
       <!-- Cancellation prompt -->
@@ -166,6 +195,21 @@
           <div id="cancelPrompt"></div>
           <button class="btn btn-outline" onclick="handleCancel()">Cancel My Spot</button>
         </div>
+      </div>
+
+      <!-- Impact table -->
+      <div class="result-card impact-card">
+        <h3>📊 EventWise Impact</h3>
+        <table class="results-table">
+          <thead><tr><th>Metric</th><th>Without EventWise</th><th>With EventWise</th></tr></thead>
+          <tbody>
+            <tr><td>Organizer planning basis</td><td style="color:#f87171">Registration count</td><td style="color:#4ade80">Predicted attendance</td></tr>
+            <tr><td>Food/resource waste</td><td style="color:#f87171">Prepared for 100%, used by ~60%</td><td style="color:#4ade80">Prepared for predicted 65–70%</td></tr>
+            <tr><td>Student no-show rate</td><td style="color:#f87171">40–50% (free events)</td><td style="color:#4ade80">Targeted reduction up to 35%</td></tr>
+            <tr><td>Student reminders</td><td style="color:#f87171">Generic or none</td><td style="color:#4ade80">Personalized, schedule-aware</td></tr>
+          </tbody>
+        </table>
+        <div class="data-badge" style="margin-top:0.75rem">📌 Sources: appendment.com · tixfox.co · hitemupapp.com · moldstud.com · instantly.ai</div>
       </div>
 
     </div>
