@@ -236,55 +236,84 @@
   <!-- BULK EMAIL SECTION -->
   <div class="bulk-email-section">
     <div class="bulk-email-header">
-      <h2>📨 Bulk Student Email</h2>
-      <p>Upload a student CSV — EventWise generates a personalized email for each student and sends them all automatically</p>
+      <h2>&#128232; Student Email Manager</h2>
+      <p>Upload a student CSV, preview all students, select who to email, then send personalized emails to your selection</p>
     </div>
 
-    <div class="bulk-email-layout">
-      <div class="bulk-upload-box">
-        <div class="bulk-format">
-          <strong>Required CSV columns:</strong>
-          <code>student_name, email, event_name, event_time, event_location, last_class_end_time, last_class_location, distance_miles, student_major, event_topic, interest_match_score, past_attended, past_no_shows, day_of_week, registration_days_ago</code>
+    <!-- STEP 1: UPLOAD -->
+    <div class="bulk-step-card" id="step1Card">
+      <div class="bulk-step-label">STEP 1 &mdash; Upload Student List</div>
+      <div class="bulk-format">
+        <strong>Required CSV columns:</strong>
+        <code>student_name, email, event_name, event_time, event_location, last_class_end_time, last_class_location, distance_miles, student_major, event_topic, interest_match_score, past_attended, past_no_shows, day_of_week, registration_days_ago</code>
+      </div>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.75rem">
+        <a href="/api/student-dataset-sample" class="btn btn-secondary">&#11015; Download Sample CSV</a>
+      </div>
+      <div class="upload-area" id="bulkUploadArea" style="margin-top:0.75rem">
+        <div class="upload-icon">&#128194;</div>
+        <div class="upload-title">Drop student CSV here or click to browse</div>
+        <input type="file" id="bulkFileInput" accept=".csv,.xlsx,.xls" style="display:none"/>
+      </div>
+      <button class="btn btn-primary btn-full" id="previewBtn" onclick="previewStudents()" disabled>
+        &#128065; Preview Students
+      </button>
+    </div>
+
+    <!-- STEP 2: SELECT -->
+    <div class="bulk-step-card" id="step2Card" style="display:none">
+      <div class="bulk-step-label">STEP 2 &mdash; Select Students to Email</div>
+      <div class="select-toolbar">
+        <div class="select-actions">
+          <button class="sel-btn" onclick="selectAll()">&#9745; Select All</button>
+          <button class="sel-btn" onclick="selectNone()">&#9744; Deselect All</button>
+          <button class="sel-btn" onclick="selectLowLikelihood()">&#128201; Low Likelihood Only</button>
+          <button class="sel-btn" onclick="selectWithWarnings()">&#9888; With Warnings Only</button>
         </div>
-        <a href="/api/student-dataset-sample" class="btn btn-secondary" style="margin-bottom:0.75rem">
-          ⬇️ Download Sample Student CSV
-        </a>
-        <div class="upload-area" id="bulkUploadArea">
-          <div class="upload-icon">📂</div>
-          <div class="upload-title">Drop student CSV here or click to browse</div>
-          <input type="file" id="bulkFileInput" accept=".csv,.xlsx,.xls" style="display:none"/>
-        </div>
-        <button class="btn btn-primary btn-full" id="bulkSendBtn" onclick="sendBulkEmails()" disabled>
-          📨 Generate &amp; Send All Emails
+        <div class="select-count" id="selectCount">0 selected</div>
+      </div>
+      <div class="table-wrap">
+        <table class="results-table student-select-table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="masterCheck" onchange="toggleAll(this)"/></th>
+              <th>Student</th>
+              <th>Email</th>
+              <th>Event</th>
+              <th>Likelihood</th>
+              <th>Warnings</th>
+              <th>Email Preview</th>
+            </tr>
+          </thead>
+          <tbody id="studentSelectTable"></tbody>
+        </table>
+      </div>
+      <div class="send-toolbar">
+        <div class="send-info" id="sendInfo">Select students above to send emails</div>
+        <button class="btn btn-primary" id="sendSelectedBtn" onclick="sendSelectedEmails()" disabled>
+          &#128232; Send to Selected Students
         </button>
       </div>
-
-      <div id="bulkResults" style="display:none">
-        <div class="gate-badge" id="bulkStatusBadge"></div>
-        <div class="result-card" style="margin-top:1rem">
-          <h3>📊 Bulk Send Results</h3>
-          <div class="bulk-summary-row" id="bulkEmailSummary"></div>
-        </div>
-        <div class="result-card" style="margin-top:1rem">
-          <h3>📋 Per-Student Results</h3>
-          <div class="table-wrap">
-            <table class="results-table">
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Email</th>
-                  <th>Event</th>
-                  <th>Likelihood</th>
-                  <th>Warnings</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="bulkEmailTable"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
+
+    <!-- STEP 3: RESULTS -->
+    <div class="bulk-step-card" id="step3Card" style="display:none">
+      <div class="bulk-step-label">STEP 3 &mdash; Send Results</div>
+      <div class="gate-badge" id="bulkStatusBadge"></div>
+      <div class="bulk-summary-row" id="bulkEmailSummary" style="margin-top:1rem"></div>
+      <div class="table-wrap" style="margin-top:1rem">
+        <table class="results-table">
+          <thead>
+            <tr><th>Student</th><th>Email</th><th>Event</th><th>Status</th></tr>
+          </thead>
+          <tbody id="bulkEmailTable"></tbody>
+        </table>
+      </div>
+      <button class="btn btn-secondary" style="margin-top:1rem" onclick="resetBulk()">
+        &#8617; Send Another Batch
+      </button>
+    </div>
+
   </div>
 
   <script src="/static/js/student.js"></script>

@@ -260,8 +260,93 @@ def send_email():
     return jsonify(result)
 
 
-@app.route("/api/bulk-email", methods=["POST"])
-def bulk_email():
+@app.route("/api/preview-students", methods=["POST"])
+def preview_students():
+    """
+    Parse student CSV and return insights for each student
+    WITHOUT sending emails — for the selection UI.
+    """
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+
+    file = request.files["file"]
+    filename = file.filename.lower()
+
+    try:
+        if filename.endswith(".csv"):
+            students = _parse_csv(file)
+        elif filename.endswith(".xlsx") or filename.endswith(".xls"):
+            students = _parse_excel(file)
+        else:
+            return jsonify({"error": "Only CSV or Excel files supported"}), 400
+    except Exception as e:
+        return jsonify({"error": f"Could not parse file: {str(e)}"}), 400
+
+    previews = []
+    for i, student in enumerate(students):
+        insights = get_student_insights(student)
+        email_body = insights.get("email_preview", "")
+        subject = ""
+        if email_body:
+            subject = email_body.split("\n")[0].replace("Subject: ", "").strip()
+
+        previews.append({
+            "index": i,
+            "student_name": student.get("student_name", f"Student {i+1}"),
+            "email": student.get("email", ""),
+            "event_name": student.get("event_name", ""),
+            "likelihood": insights["attendance_likelihood"]["score"],
+            "likelihood_label": insights["attendance_likelihood"]["label"],
+            "likelihood_color": insights["attendance_likelihood"]["color"],
+            "warnings": len(insights.get("warnings", [])),
+            "warning_messages": [w["message"] for w in insights.get("warnings", [])],
+            "email_subject": subject,
+            "email_body": email_body,
+            "has_valid_email": bool(student.get("email") and "@" in student.get("email", ""))
+        })
+
+    return jsonify({"students": previews, "total": len(previews)})
+
+
+@app.route("/api/send-selected", methods=["POST"])
+def send_selected():
+    """
+    Send emails to a selected subset of students.
+    Body: { students: [ {email, email_subject, email_body, student_name, event_name}, ... ] }
+    """
+    data = request.get_json()
+    selected = data.get("students", [])
+
+    if not selected:
+        return jsonify({"error": "No students selected"}), 400
+
+    results = []
+    sent = 0
+    failed = 0
+
+    for s in selected:
+        email = s.get("email", "").strip()
+        subject = s.get("email_subject", "EventWise Reminder")
+        body = s.get("email_body", "")
+        name = s.get("student_name", "Student")
+
+        if not email or "@" not in email or not body:
+            failed += 1
+            results.append({"name": name, "email": email, "status": "FAILED", "reason": "Missing email or content"})
+            continue
+
+        result = send_reminder_email(email, subject, plain_text=body)
+        if result["status"] == "SENT":
+            sent += 1
+            results.append({"name": name, "email": email, "event": s.get("event_name", ""), "status": "SENT"})
+        else:
+            failed += 1
+            results.append({"name": name, "email": email, "status": "FAILED", "reason": result.get("reason", "")})
+
+    return jsonify({
+        "summary": {"total": len(selected), "sent": sent, "failed": failed},
+        "results": results
+    })
     """
     Accept a student CSV/Excel file.
     Generate personalized insights + email for each student.

@@ -189,10 +189,12 @@ function showEmailStatus(type, message) {
   div.textContent = message;
 }
 
-// ===== BULK EMAIL UPLOAD =====
+
+// ===== BULK EMAIL — FILE UPLOAD =====
 const bulkArea = document.getElementById("bulkUploadArea");
 const bulkInput = document.getElementById("bulkFileInput");
 let bulkFile = null;
+let allStudents = [];
 
 if (bulkArea) {
   bulkArea.addEventListener("click", () => bulkInput.click());
@@ -210,82 +212,183 @@ if (bulkArea) {
 
 function setBulkFile(file) {
   bulkFile = file;
-  bulkArea.innerHTML = `<div class="upload-filename">📄 ${file.name} (${(file.size/1024).toFixed(1)} KB) — Ready</div>`;
-  document.getElementById("bulkSendBtn").disabled = false;
+  bulkArea.innerHTML = `<div class="upload-filename">📄 ${file.name} (${(file.size/1024).toFixed(1)} KB) — Ready to preview</div>`;
+  document.getElementById("previewBtn").disabled = false;
 }
 
-async function sendBulkEmails() {
+// ===== STEP 1 → STEP 2: PREVIEW STUDENTS =====
+async function previewStudents() {
   if (!bulkFile) return;
-  const btn = document.getElementById("bulkSendBtn");
-  btn.textContent = "📨 Sending...";
+  const btn = document.getElementById("previewBtn");
+  btn.textContent = "👁️ Loading...";
   btn.disabled = true;
 
   const formData = new FormData();
   formData.append("file", bulkFile);
 
   try {
-    const res = await fetch("/api/bulk-email", { method: "POST", body: formData });
+    const res = await fetch("/api/preview-students", { method: "POST", body: formData });
     const data = await res.json();
     if (!res.ok) { alert("Error: " + (data.error || "Unknown")); return; }
-    renderBulkEmailResults(data);
+    allStudents = data.students;
+    renderStudentTable(data.students);
+    document.getElementById("step1Card").style.display = "none";
+    document.getElementById("step2Card").style.display = "block";
+    document.getElementById("step2Card").scrollIntoView({ behavior: "smooth" });
   } catch (err) {
     alert("Something went wrong. Please try again.");
   } finally {
-    btn.textContent = "📨 Generate & Send All Emails";
+    btn.textContent = "👁️ Preview Students";
     btn.disabled = false;
   }
 }
 
-function renderBulkEmailResults(data) {
-  const panel = document.getElementById("bulkResults");
-  panel.style.display = "block";
+// ===== RENDER STUDENT SELECTION TABLE =====
+function renderStudentTable(students) {
+  const tbody = document.getElementById("studentSelectTable");
+  tbody.innerHTML = students.map((s, i) => {
+    const lClass = s.likelihood >= 70 ? "badge-high" : s.likelihood >= 45 ? "badge-medium" : "badge-low";
+    const warnBadge = s.warnings > 0
+      ? `<span style="color:#f59e0b" title="${s.warning_messages.join(' | ')}">⚠️ ${s.warnings} warning${s.warnings > 1 ? 's' : ''}</span>`
+      : `<span style="color:#4ade80">✅ None</span>`;
+    const emailBadge = s.has_valid_email
+      ? `<span style="color:#4ade80;font-size:0.75rem">✅ Valid</span>`
+      : `<span style="color:#f87171;font-size:0.75rem">❌ Missing</span>`;
+    const previewSnippet = s.email_subject
+      ? `<span style="color:#a5b4fc;font-size:0.75rem" title="${s.email_body}">${s.email_subject.substring(0, 35)}...</span>`
+      : `<span style="color:#4b5563;font-size:0.75rem">—</span>`;
 
-  // Badge
+    return `<tr id="row-${i}" class="${s.warnings > 0 ? 'row-warning' : ''}">
+      <td><input type="checkbox" class="student-check" data-index="${i}"
+          ${!s.has_valid_email ? 'disabled title="No valid email"' : ''}
+          onchange="updateCount()"/></td>
+      <td><strong>${s.student_name}</strong></td>
+      <td style="font-size:0.8rem;color:#6b7280">${s.email || '—'} ${emailBadge}</td>
+      <td style="font-size:0.85rem">${s.event_name}</td>
+      <td class="${lClass}">${s.likelihood}% <span style="font-size:0.72rem">${s.likelihood_label}</span></td>
+      <td>${warnBadge}</td>
+      <td>${previewSnippet}</td>
+    </tr>`;
+  }).join("");
+  updateCount();
+}
+
+// ===== CHECKBOX HELPERS =====
+function toggleAll(master) {
+  document.querySelectorAll(".student-check:not(:disabled)").forEach(cb => cb.checked = master.checked);
+  updateCount();
+}
+
+function selectAll() {
+  document.querySelectorAll(".student-check:not(:disabled)").forEach(cb => cb.checked = true);
+  document.getElementById("masterCheck").checked = true;
+  updateCount();
+}
+
+function selectNone() {
+  document.querySelectorAll(".student-check").forEach(cb => cb.checked = false);
+  document.getElementById("masterCheck").checked = false;
+  updateCount();
+}
+
+function selectLowLikelihood() {
+  document.querySelectorAll(".student-check").forEach(cb => cb.checked = false);
+  document.querySelectorAll(".student-check:not(:disabled)").forEach(cb => {
+    const idx = parseInt(cb.dataset.index);
+    if (allStudents[idx].likelihood < 60) cb.checked = true;
+  });
+  updateCount();
+}
+
+function selectWithWarnings() {
+  document.querySelectorAll(".student-check").forEach(cb => cb.checked = false);
+  document.querySelectorAll(".student-check:not(:disabled)").forEach(cb => {
+    const idx = parseInt(cb.dataset.index);
+    if (allStudents[idx].warnings > 0) cb.checked = true;
+  });
+  updateCount();
+}
+
+function updateCount() {
+  const checked = document.querySelectorAll(".student-check:checked").length;
+  document.getElementById("selectCount").textContent = `${checked} selected`;
+  const btn = document.getElementById("sendSelectedBtn");
+  const info = document.getElementById("sendInfo");
+  btn.disabled = checked === 0;
+  info.textContent = checked > 0
+    ? `Ready to send ${checked} personalized email${checked > 1 ? 's' : ''}`
+    : "Select students above to send emails";
+}
+
+// ===== STEP 2 → STEP 3: SEND SELECTED =====
+async function sendSelectedEmails() {
+  const checked = document.querySelectorAll(".student-check:checked");
+  if (checked.length === 0) return;
+
+  const btn = document.getElementById("sendSelectedBtn");
+  btn.textContent = `📨 Sending ${checked.length} emails...`;
+  btn.disabled = true;
+
+  const selected = Array.from(checked).map(cb => {
+    const idx = parseInt(cb.dataset.index);
+    return allStudents[idx];
+  });
+
+  try {
+    const res = await fetch("/api/send-selected", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ students: selected })
+    });
+    const data = await res.json();
+    if (!res.ok) { alert("Error: " + (data.error || "Unknown")); return; }
+    renderSendResults(data);
+    document.getElementById("step2Card").style.display = "none";
+    document.getElementById("step3Card").style.display = "block";
+    document.getElementById("step3Card").scrollIntoView({ behavior: "smooth" });
+  } catch (err) {
+    alert("Something went wrong. Please try again.");
+  } finally {
+    btn.textContent = "📨 Send to Selected Students";
+    btn.disabled = false;
+  }
+}
+
+// ===== RENDER SEND RESULTS =====
+function renderSendResults(data) {
   const badge = document.getElementById("bulkStatusBadge");
-  const allSent = data.summary.failed === 0 && data.summary.skipped === 0;
-  badge.className = allSent ? "gate-badge" : "gate-badge blocked";
-  badge.textContent = allSent
+  badge.className = data.summary.failed === 0 ? "gate-badge" : "gate-badge blocked";
+  badge.textContent = data.summary.failed === 0
     ? `✅ All ${data.summary.sent} emails sent successfully`
-    : `📨 ${data.summary.sent} sent · ${data.summary.failed} failed · ${data.summary.skipped} skipped`;
+    : `📨 ${data.summary.sent} sent · ${data.summary.failed} failed`;
 
-  // Summary cards
   document.getElementById("bulkEmailSummary").innerHTML = `
-    <div class="bulk-stat">
-      <div class="bulk-stat-num">${data.summary.total}</div>
-      <div class="bulk-stat-label">Students processed</div>
-    </div>
-    <div class="bulk-stat">
-      <div class="bulk-stat-num green">${data.summary.sent}</div>
-      <div class="bulk-stat-label">Emails sent</div>
-    </div>
-    <div class="bulk-stat">
-      <div class="bulk-stat-num" style="color:#f87171">${data.summary.failed + data.summary.skipped}</div>
-      <div class="bulk-stat-label">Failed / skipped</div>
-    </div>
+    <div class="bulk-stat"><div class="bulk-stat-num">${data.summary.total}</div><div class="bulk-stat-label">Selected</div></div>
+    <div class="bulk-stat"><div class="bulk-stat-num green">${data.summary.sent}</div><div class="bulk-stat-label">Sent ✅</div></div>
+    <div class="bulk-stat"><div class="bulk-stat-num" style="color:#f87171">${data.summary.failed}</div><div class="bulk-stat-label">Failed ❌</div></div>
   `;
 
-  // Per-student table
-  document.getElementById("bulkEmailTable").innerHTML = data.results.map(r => {
-    if (r.status === "SENT") {
-      const lClass = r.likelihood >= 70 ? "badge-high" : r.likelihood >= 45 ? "badge-medium" : "badge-low";
-      const warnBadge = r.warnings > 0 ? `<span style="color:#f59e0b">⚠️ ${r.warnings}</span>` : `<span style="color:#4ade80">✅ None</span>`;
-      return `<tr>
-        <td><strong>${r.name}</strong></td>
-        <td style="color:#6b7280;font-size:0.8rem">${r.email}</td>
-        <td>${r.event}</td>
-        <td class="${lClass}">${r.likelihood}% ${r.likelihood_label}</td>
-        <td>${warnBadge}</td>
-        <td style="color:#4ade80;font-weight:600">✅ Sent</td>
-      </tr>`;
-    } else {
-      return `<tr>
-        <td><strong>${r.name}</strong></td>
-        <td style="color:#6b7280;font-size:0.8rem">${r.email}</td>
-        <td colspan="3" style="color:#f87171;font-size:0.8rem">${r.reason || r.status}</td>
-        <td style="color:#f87171;font-weight:600">❌ ${r.status}</td>
-      </tr>`;
-    }
-  }).join("");
+  document.getElementById("bulkEmailTable").innerHTML = data.results.map(r =>
+    `<tr>
+      <td><strong>${r.name}</strong></td>
+      <td style="color:#6b7280;font-size:0.8rem">${r.email}</td>
+      <td style="font-size:0.85rem">${r.event || '—'}</td>
+      <td style="font-weight:600;color:${r.status === 'SENT' ? '#4ade80' : '#f87171'}">
+        ${r.status === 'SENT' ? '✅ Sent' : '❌ ' + (r.reason || 'Failed')}
+      </td>
+    </tr>`
+  ).join("");
+}
 
-  panel.scrollIntoView({ behavior: "smooth" });
+function resetBulk() {
+  bulkFile = null;
+  allStudents = [];
+  document.getElementById("step3Card").style.display = "none";
+  document.getElementById("step2Card").style.display = "none";
+  document.getElementById("step1Card").style.display = "block";
+  document.getElementById("bulkUploadArea").innerHTML = `
+    <div class="upload-icon">📂</div>
+    <div class="upload-title">Drop student CSV here or click to browse</div>`;
+  document.getElementById("previewBtn").disabled = true;
+  document.getElementById("step1Card").scrollIntoView({ behavior: "smooth" });
 }
