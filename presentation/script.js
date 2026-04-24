@@ -1,48 +1,35 @@
 const slides = document.querySelectorAll(".slide");
-const totalSlides = slides.length;
-let current = 0;
+const total = slides.length;
+let cur = 0;
 
-document.getElementById("totalSlides").textContent = totalSlides;
+document.getElementById("tot").textContent = total;
 
-function showSlide(index) {
+function showSlide(n) {
   slides.forEach(s => s.classList.remove("active"));
-  slides[index].classList.add("active");
-  document.getElementById("currentSlide").textContent = index + 1;
-  document.getElementById("prevBtn").disabled = index === 0;
-  document.getElementById("nextBtn").disabled = index === totalSlides - 1;
+  slides[n].classList.add("active");
+  document.getElementById("cur").textContent = n + 1;
+  document.getElementById("progressFill").style.width = ((n + 1) / total * 100) + "%";
+  document.getElementById("prevBtn").disabled = n === 0;
+  document.getElementById("nextBtn").disabled = n === total - 1;
 }
 
-function changeSlide(dir) {
-  const next = current + dir;
-  if (next >= 0 && next < totalSlides) {
-    current = next;
-    showSlide(current);
-  }
+function go(dir) {
+  const next = cur + dir;
+  if (next >= 0 && next < total) { cur = next; showSlide(cur); }
 }
 
-// Keyboard navigation
-document.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowRight" || e.key === "ArrowDown" || e.key === " ") {
-    e.preventDefault();
-    changeSlide(1);
-  } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-    e.preventDefault();
-    changeSlide(-1);
-  } else if (e.key === "Home") {
-    current = 0;
-    showSlide(0);
-  } else if (e.key === "End") {
-    current = totalSlides - 1;
-    showSlide(current);
-  }
+document.addEventListener("keydown", e => {
+  if (["ArrowRight","ArrowDown"," "].includes(e.key)) { e.preventDefault(); go(1); }
+  else if (["ArrowLeft","ArrowUp"].includes(e.key)) { e.preventDefault(); go(-1); }
+  else if (e.key === "Home") { cur = 0; showSlide(0); }
+  else if (e.key === "End") { cur = total - 1; showSlide(cur); }
 });
 
-// Touch swipe support
-let touchStartX = 0;
-document.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; });
-document.addEventListener("touchend", (e) => {
-  const diff = touchStartX - e.changedTouches[0].clientX;
-  if (Math.abs(diff) > 50) changeSlide(diff > 0 ? 1 : -1);
+let tx = 0;
+document.addEventListener("touchstart", e => { tx = e.touches[0].clientX; });
+document.addEventListener("touchend", e => {
+  const d = tx - e.changedTouches[0].clientX;
+  if (Math.abs(d) > 50) go(d > 0 ? 1 : -1);
 });
 
 showSlide(0);
