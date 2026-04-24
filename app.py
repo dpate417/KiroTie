@@ -252,7 +252,7 @@ def send_email():
     if not email_body:
         return jsonify({"status": "ERROR", "reason": "No email content provided"}), 400
 
-    result = send_reminder_email(to_email, subject, email_body)
+    result = send_reminder_email(to_email, subject, plain_text=email_body)
 
     if result["status"] == "ERROR":
         return jsonify(result), 400

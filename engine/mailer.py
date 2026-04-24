@@ -42,9 +42,20 @@ def send_reminder_email(to_email: str, subject: str, plain_text: str) -> dict:
         html_body = _build_html(subject, plain_text)
         msg.attach(MIMEText(html_body, "html"))
 
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(sender, password)
-            server.sendmail(sender, to_email, msg.as_string())
+        smtp_host = "smtp.gmail.com"
+        smtp_port = 465
+        # Auto-detect Outlook accounts
+        if sender and ("outlook" in sender or "hotmail" in sender or "live" in sender):
+            smtp_host = "smtp.office365.com"
+            smtp_port = 587
+            with smtplib.SMTP(smtp_host, smtp_port) as server:
+                server.starttls()
+                server.login(sender, password)
+                server.sendmail(sender, to_email, msg.as_string())
+        else:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+                server.login(sender, password)
+                server.sendmail(sender, to_email, msg.as_string())
 
         return {
             "status": "SENT",
