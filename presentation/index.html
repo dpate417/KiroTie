@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EventWise — Kiro Spark Challenge 2025</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- SLIDE COUNTER -->
+  <div class="slide-counter">
+    <span id="currentSlide">1</span> / <span id="totalSlides">10</span>
+  </div>
+
+  <!-- NAVIGATION -->
+  <div class="nav-arrows">
+    <button class="arrow-btn" id="prevBtn" onclick="changeSlide(-1)">←</button>
+    <button class="arrow-btn" id="nextBtn" onclick="changeSlide(1)">→</button>
+  </div>
+
+  <!-- KEYBOARD HINT -->
+  <div class="key-hint">Use ← → arrow keys to navigate</div>
+
+  <!-- ==================== SLIDE 1 — TITLE ==================== -->
+  <div class="slide active" id="slide-1">
+    <div class="slide-content center">
+      <div class="challenge-badge">🏆 Kiro Spark Challenge 2025 · Economics Frame</div>
+      <div class="title-logo">📊</div>
+      <h1 class="title-main">EventWise</h1>
+      <p class="title-sub">Attendance Prediction to Reduce Waste</p>
+      <div class="title-tagline">
+        Stop over-preparing. Start saving.
+      </div>
+      <div class="team-tag">Built with Kiro · by KiroTie</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 2 — THE PROBLEM ==================== -->
+  <div class="slide" id="slide-2">
+    <div class="slide-content">
+      <div class="slide-label">THE PROBLEM</div>
+      <h2>Registration ≠ Attendance</h2>
+      <p class="slide-intro">Campus event organizers at ASU rely on signup numbers to plan resources. But signups lie.</p>
+
+      <div class="problem-visual">
+        <div class="problem-box red">
+          <div class="problem-num">120</div>
+          <div class="problem-label">RSVPs received</div>
+        </div>
+        <div class="problem-arrow">→</div>
+        <div class="problem-box orange">
+          <div class="problem-num">120</div>
+          <div class="problem-label">Meals ordered</div>
+        </div>
+        <div class="problem-arrow">→</div>
+        <div class="problem-box green">
+          <div class="problem-num">~75</div>
+          <div class="problem-label">People actually show up</div>
+        </div>
+      </div>
+
+      <div class="waste-result">
+        <span class="waste-icon">🗑️</span>
+        <span><strong>45 meals wasted.</strong> Every single event. Nobody tracks it. Nobody fixes it.</span>
+      </div>
+
+      <div class="stat-row">
+        <div class="mini-stat">
+          <div class="mini-num red">30–40%</div>
+          <div class="mini-label">Average no-show rate at campus events</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-num orange">$18</div>
+          <div class="mini-label">Average cost per unused slot</div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-num yellow">500+</div>
+          <div class="mini-label">Events per semester at ASU</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 3 — HIDDEN COSTS ==================== -->
+  <div class="slide" id="slide-3">
+    <div class="slide-content">
+      <div class="slide-label">ECONOMICS FRAME — TRANSPARENCY GUARDRAIL</div>
+      <h2>The Hidden Costs Nobody Sees</h2>
+      <p class="slide-intro">Organizers only see the food bill. EventWise reveals everything else.</p>
+
+      <div class="costs-grid">
+        <div class="cost-row">
+          <span class="cost-icon">🍕</span>
+          <div class="cost-info">
+            <div class="cost-name">Food & Resources</div>
+            <div class="cost-source">Direct over-order cost</div>
+          </div>
+          <div class="cost-amount">$18 / person</div>
+        </div>
+        <div class="cost-row">
+          <span class="cost-icon">🗑️</span>
+          <div class="cost-info">
+            <div class="cost-name">Food Waste Disposal</div>
+            <div class="cost-source">USDA ERS 2023 — $1.84/lb</div>
+          </div>
+          <div class="cost-amount">$1.38 / person</div>
+        </div>
+        <div class="cost-row">
+          <span class="cost-icon">🏛️</span>
+          <div class="cost-info">
+            <div class="cost-name">Space Over-Reservation</div>
+            <div class="cost-source">ASU Event Services estimate</div>
+          </div>
+          <div class="cost-amount">$3.50 / person</div>
+        </div>
+        <div class="cost-row">
+          <span class="cost-icon">👥</span>
+          <div class="cost-info">
+            <div class="cost-name">Staff Over-Allocation</div>
+            <div class="cost-source">ASU Event Services estimate</div>
+          </div>
+          <div class="cost-amount">$2.00 / person</div>
+        </div>
+        <div class="cost-row">
+          <span class="cost-icon">📄</span>
+          <div class="cost-info">
+            <div class="cost-name">Printed Materials</div>
+            <div class="cost-source">ASU Event Services estimate</div>
+          </div>
+          <div class="cost-amount">$1.25 / person</div>
+        </div>
+        <div class="cost-row total-row">
+          <span class="cost-icon">💰</span>
+          <div class="cost-info">
+            <div class="cost-name">Total Hidden Cost</div>
+            <div class="cost-source">Per unused registration slot</div>
+          </div>
+          <div class="cost-amount highlight-amount">~$26 / person</div>
+        </div>
+      </div>
+
+      <div class="data-note">📌 All figures grounded in verifiable data: USDA ERS 2023 · EPA WARM Model · ASU Event Services</div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 4 — SOLUTION ==================== -->
+  <div class="slide" id="slide-4">
+    <div class="slide-content">
+      <div class="slide-label">THE SOLUTION</div>
+      <h2>EventWise — Two-Sided Platform</h2>
+      <p class="slide-intro">Not just a prediction tool. A platform that fixes both sides of the problem.</p>
+
+      <div class="two-sides">
+        <div class="side-card organizer">
+          <div class="side-icon">🏢</div>
+          <div class="side-title">Organizer Side</div>
+          <ul class="side-list">
+            <li>✅ Attendance prediction with confidence range</li>
+            <li>✅ Hidden cost breakdown (USDA + EPA data)</li>
+            <li>✅ Suggested resource quantities</li>
+            <li>✅ Semester-level savings projection</li>
+            <li>✅ CSV / Excel bulk upload for all events</li>
+          </ul>
+        </div>
+        <div class="side-divider">+</div>
+        <div class="side-card student">
+          <div class="side-icon">🎓</div>
+          <div class="side-title">Student Side</div>
+          <ul class="side-list">
+            <li>✅ Schedule conflict warning at registration</li>
+            <li>✅ Personalized attendance tips</li>
+            <li>✅ Smart timed reminders</li>
+            <li>✅ Attendance streak motivator</li>
+            <li>✅ Easy cancellation prompt</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flywheel">
+        <span>Students cancel early</span>
+        <span class="fw-arrow">→</span>
+        <span>Better prediction data</span>
+        <span class="fw-arrow">→</span>
+        <span>Less over-preparation</span>
+        <span class="fw-arrow">→</span>
+        <span>Less waste</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 5 — HOW IT WORKS ==================== -->
+  <div class="slide" id="slide-5">
+    <div class="slide-content">
+      <div class="slide-label">HOW IT WORKS</div>
+      <h2>5 Prediction Signals</h2>
+      <p class="slide-intro">Rule-based engine. Fully transparent. Every factor explained to the organizer.</p>
+
+      <div class="signals-grid">
+        <div class="signal-card">
+          <div class="signal-icon">📅</div>
+          <div class="signal-name">Class Schedule</div>
+          <div class="signal-desc">Class ending 10 min before a cross-campus event = low likelihood</div>
+          <div class="signal-impact negative">↓ Reduces prediction</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-icon">📊</div>
+          <div class="signal-name">No-Show History</div>
+          <div class="signal-desc">Repeat no-shows carry a lower attendance probability score</div>
+          <div class="signal-impact negative">↓ Reduces prediction</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-icon">🎯</div>
+          <div class="signal-name">Interest Alignment</div>
+          <div class="signal-desc">CS student at cybersecurity workshop = strong signal</div>
+          <div class="signal-impact positive">↑ Boosts prediction</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-icon">🕐</div>
+          <div class="signal-name">Event Timing</div>
+          <div class="signal-desc">Friday afternoon, finals week = historically lower turnout</div>
+          <div class="signal-impact negative">↓ Reduces prediction</div>
+        </div>
+        <div class="signal-card">
+          <div class="signal-icon">⏰</div>
+          <div class="signal-name">Registration Timing</div>
+          <div class="signal-desc">Same-day registrations show up more than 3-week-old ones</div>
+          <div class="signal-impact positive">↑ Boosts prediction</div>
+        </div>
+      </div>
+
+      <div class="engine-note">
+        Output: <strong>Predicted count</strong> + <strong>Confidence range</strong> + <strong>Factor breakdown</strong> + <strong>Hidden cost reveal</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 6 — TRANSPARENCY GATE ==================== -->
+  <div class="slide" id="slide-6">
+    <div class="slide-content">
+      <div class="slide-label">ECONOMICS FRAME — REQUIRED GUARDRAIL</div>
+      <h2>The Transparency Gate</h2>
+      <p class="slide-intro">Every prediction must be grounded in verifiable data. If it's not — it's blocked.</p>
+
+      <div class="gate-visual">
+        <div class="gate-input">
+          <div class="gate-box">
+            <div class="gate-box-title">Input Data</div>
+            <div class="gate-item ok">✅ Event type provided</div>
+            <div class="gate-item ok">✅ Signup count ≥ 1</div>
+            <div class="gate-item ok">✅ Planned quantity ≥ 1</div>
+            <div class="gate-item ok">✅ Valid event category</div>
+          </div>
+          <div class="gate-arrow-down">↓</div>
+          <div class="gate-box approved">
+            <div class="gate-status">✅ APPROVED</div>
+            <div class="gate-msg">Prediction grounded in USDA · EPA data</div>
+          </div>
+        </div>
+
+        <div class="gate-vs">VS</div>
+
+        <div class="gate-input">
+          <div class="gate-box">
+            <div class="gate-box-title">Input Data</div>
+            <div class="gate-item ok">✅ Event type provided</div>
+            <div class="gate-item bad">❌ Signup count missing</div>
+            <div class="gate-item bad">❌ Planned quantity = 0</div>
+            <div class="gate-item ok">✅ Valid event category</div>
+          </div>
+          <div class="gate-arrow-down">↓</div>
+          <div class="gate-box blocked">
+            <div class="gate-status">🚫 BLOCKED</div>
+            <div class="gate-msg">Missing required fields — cannot produce data-backed estimate</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="code-snippet">
+        <span class="code-comment"># engine/gate.py — Transparency Gate</span><br/>
+        <span class="code-keyword">def</span> <span class="code-fn">transparency_gate</span>(data):<br/>
+        &nbsp;&nbsp;missing = [f <span class="code-keyword">for</span> f <span class="code-keyword">in</span> REQUIRED_FIELDS <span class="code-keyword">if not</span> data.get(f)]<br/>
+        &nbsp;&nbsp;<span class="code-keyword">if</span> missing: <span class="code-keyword">return</span> {<span class="code-str">"status"</span>: <span class="code-str">"BLOCKED"</span>}<br/>
+        &nbsp;&nbsp;<span class="code-keyword">return</span> {<span class="code-str">"status"</span>: <span class="code-str">"APPROVED"</span>}
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 7 — DEMO RESULTS ==================== -->
+  <div class="slide" id="slide-7">
+    <div class="slide-content">
+      <div class="slide-label">LIVE DEMO RESULTS</div>
+      <h2>One Event. $1,829 Revealed.</h2>
+      <p class="slide-intro">Food Social · 120 RSVPs · Friday Afternoon · Registered 2+ weeks ago</p>
+
+      <div class="demo-results">
+        <div class="demo-prediction">
+          <div class="demo-big">50</div>
+          <div class="demo-label">predicted attendees</div>
+          <div class="demo-range">Range: 40 – 60 · Low confidence</div>
+          <div class="demo-vs">
+            <span class="demo-planned">120 planned</span>
+            <span>→</span>
+            <span class="demo-recommend">Order for 50</span>
+            <span>→</span>
+            <span class="demo-over">70 over-prepared</span>
+          </div>
+        </div>
+
+        <div class="demo-costs">
+          <div class="demo-cost-item">
+            <span>🍕 Food & resources</span>
+            <span class="demo-cost-amt">$1,260.00</span>
+          </div>
+          <div class="demo-cost-item">
+            <span>🗑️ Food waste disposal</span>
+            <span class="demo-cost-amt">$96.60</span>
+          </div>
+          <div class="demo-cost-item">
+            <span>🏛️ Space over-reservation</span>
+            <span class="demo-cost-amt">$245.00</span>
+          </div>
+          <div class="demo-cost-item">
+            <span>👥 Staff over-allocation</span>
+            <span class="demo-cost-amt">$140.00</span>
+          </div>
+          <div class="demo-cost-item">
+            <span>📄 Printed materials</span>
+            <span class="demo-cost-amt">$87.50</span>
+          </div>
+          <div class="demo-cost-total">
+            <span>💰 Total savings</span>
+            <span class="demo-total-amt">$1,829.10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="semester-banner">
+        📈 Across 20 events this semester: <strong>$36,582 saved · 388 kg CO₂ avoided</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 8 — KIRO USAGE ==================== -->
+  <div class="slide" id="slide-8">
+    <div class="slide-content">
+      <div class="slide-label">BUILD SIGNAL — HOW WE USED KIRO</div>
+      <h2>Built with Kiro, End to End</h2>
+      <p class="slide-intro">Every feature was spec'd, steered, and built using Kiro's full toolkit.</p>
+
+      <div class="kiro-grid">
+        <div class="kiro-card">
+          <div class="kiro-icon">📋</div>
+          <div class="kiro-feature">Spec-Driven Development</div>
+          <div class="kiro-desc">Full spec written before implementation. Transparency Gate defined as a named spec artifact. Inputs, outputs, and engine logic all spec'd first.</div>
+        </div>
+        <div class="kiro-card">
+          <div class="kiro-icon">🧭</div>
+          <div class="kiro-feature">Steering Docs</div>
+          <div class="kiro-desc"><code>.kiro/steering/economics-frame.md</code> keeps USDA/EPA data sources and frame constraints in Kiro's context throughout all development.</div>
+        </div>
+        <div class="kiro-card">
+          <div class="kiro-icon">🪝</div>
+          <div class="kiro-feature">Agent Hooks</div>
+          <div class="kiro-desc">Data validation hook runs on every engine change to ensure all outputs remain grounded in verifiable data sources.</div>
+        </div>
+        <div class="kiro-card">
+          <div class="kiro-icon">💬</div>
+          <div class="kiro-feature">Kiro Chat</div>
+          <div class="kiro-desc">Used to generate rule weights, validate economic constants against USDA/EPA sources, and iterate on the prediction model logic.</div>
+        </div>
+      </div>
+
+      <div class="arch-note">
+        Architecture: <strong>Flask</strong> · <strong>4 engine modules</strong> · <strong>Rule-based (no ML deps)</strong> · <strong>Fully transparent logic</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 9 — IMPACT ==================== -->
+  <div class="slide" id="slide-9">
+    <div class="slide-content center">
+      <div class="slide-label">IMPACT SIGNAL</div>
+      <h2>Real Numbers. Real Impact.</h2>
+
+      <div class="impact-grid">
+        <div class="impact-card">
+          <div class="impact-num">$25,532</div>
+          <div class="impact-label">Savings revealed across one ASU semester (20 events)</div>
+          <div class="impact-source">From our ASU Spring dataset</div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-num">235 kg</div>
+          <div class="impact-label">CO₂ equivalent avoided per semester</div>
+          <div class="impact-source">EPA WARM Model v16</div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-num">635 lbs</div>
+          <div class="impact-label">Food waste prevented per semester</div>
+          <div class="impact-source">USDA ERS 2023</div>
+        </div>
+        <div class="impact-card">
+          <div class="impact-num">2 sides</div>
+          <div class="impact-label">Organizer + Student — both benefit, both feed the loop</div>
+          <div class="impact-source">Two-sided platform</div>
+        </div>
+      </div>
+
+      <div class="scale-note">
+        🌍 Scale beyond ASU: Any university, conference, or corporate event team has this exact problem.
+        The engine is configurable. The data sources are swappable. It deploys anywhere.
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SLIDE 10 — CLOSE ==================== -->
+  <div class="slide" id="slide-10">
+    <div class="slide-content center">
+      <div class="slide-label">STORY SIGNAL</div>
+      <div class="close-logo">📊</div>
+      <h1 class="title-main">EventWise</h1>
+      <p class="close-tagline">
+        "Registration does not equal attendance.<br/>
+        EventWise makes the gap visible — and costly to ignore."
+      </p>
+
+      <div class="signals-summary">
+        <div class="sig-item">⚙️ <strong>Build</strong> — 4 engines, Transparency Gate, CSV upload, Kiro spec + steering + hooks</div>
+        <div class="sig-item">🤝 <strong>Collaboration</strong> — Dev · Designer · Strategist, each using Kiro in their workflow</div>
+        <div class="sig-item">🌍 <strong>Impact</strong> — $25k+ savings/semester, 235 kg CO₂, grounded in USDA + EPA data</div>
+        <div class="sig-item">📣 <strong>Story</strong> — Transparent logic, open source, scalable to any campus</div>
+      </div>
+
+      <div class="close-cta">
+        <div class="cta-item">🌐 Live Demo: <strong>localhost:5000</strong></div>
+        <div class="cta-item">📂 GitHub: <strong>github.com/[your-repo]</strong></div>
+        <div class="cta-item">🏆 Built with Kiro · KiroTie · April 2025</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

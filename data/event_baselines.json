@@ -1,0 +1,57 @@
+{
+  "event_types": {
+    "food_social": {
+      "base_show_rate": 0.72,
+      "description": "Food/social events",
+      "avg_cost_per_person": 18,
+      "avg_food_waste_lbs_per_person": 0.75
+    },
+    "academic_workshop": {
+      "base_show_rate": 0.65,
+      "description": "Academic workshops / lectures",
+      "avg_cost_per_person": 8,
+      "avg_food_waste_lbs_per_person": 0.3
+    },
+    "career_fair": {
+      "base_show_rate": 0.58,
+      "description": "Career fairs / networking",
+      "avg_cost_per_person": 12,
+      "avg_food_waste_lbs_per_person": 0.2
+    },
+    "club_meeting": {
+      "base_show_rate": 0.55,
+      "description": "Club / org meetings",
+      "avg_cost_per_person": 5,
+      "avg_food_waste_lbs_per_person": 0.4
+    },
+    "general": {
+      "base_show_rate": 0.62,
+      "description": "General campus event",
+      "avg_cost_per_person": 10,
+      "avg_food_waste_lbs_per_person": 0.5
+    }
+  },
+  "time_penalties": {
+    "monday_morning": -0.05,
+    "friday_afternoon": -0.12,
+    "finals_week": -0.18,
+    "midterm_week": -0.10,
+    "weekend": -0.08,
+    "prime_time": 0.05
+  },
+  "registration_timing_factors": {
+    "same_day": 0.15,
+    "one_day_before": 0.08,
+    "two_to_seven_days": 0.0,
+    "over_one_week": -0.10,
+    "over_two_weeks": -0.18
+  },
+  "economic_constants": {
+    "food_waste_cost_per_lb_usd": 1.84,
+    "co2_per_lb_food_waste_kg": 0.37,
+    "space_cost_per_extra_person_usd": 3.50,
+    "staff_cost_per_extra_person_usd": 2.00,
+    "printed_materials_cost_per_person_usd": 1.25,
+    "data_source": "USDA ERS 2023, EPA WARM Model, ASU Event Services estimates"
+  }
+}

@@ -1,0 +1,21 @@
+event_name,event_type,expected_signups,planned_quantity,cost_per_person,time_slot,registration_timing,interest_match_score,historical_show_rate
+ASU Spring Welcome Bash,food_social,300,300,20,prime_time,over_two_weeks,0.6,
+SWE Networking Mixer,career_fair,120,120,12,prime_time,two_to_seven_days,0.8,0.62
+CS Guest Lecture: AI Ethics,academic_workshop,80,80,5,prime_time,one_day_before,0.9,
+Devils Den Club Fair,food_social,250,250,18,friday_afternoon,over_two_weeks,0.5,
+Pre-Med Study Social,food_social,60,60,15,prime_time,two_to_seven_days,0.75,0.68
+Engineering Career Fair,career_fair,400,400,10,prime_time,over_one_week,0.7,0.55
+Hackathon Kickoff Night,food_social,150,150,22,friday_afternoon,one_day_before,0.85,
+Monday Morning Yoga,club_meeting,40,40,0,monday_morning,over_two_weeks,0.4,
+Finals Week Free Pizza,food_social,200,200,18,finals_week,same_day,0.6,
+Data Science Workshop,academic_workshop,70,70,8,prime_time,two_to_seven_days,0.88,0.72
+Latinx Heritage Celebration,food_social,180,180,20,prime_time,over_one_week,0.65,
+Resume Review Workshop,career_fair,90,90,5,prime_time,same_day,0.8,
+Midnight Breakfast,food_social,350,350,15,finals_week,same_day,0.7,
+Startup Pitch Night,career_fair,100,100,12,prime_time,two_to_seven_days,0.75,0.60
+Weekend Outdoor Movie,general,130,130,8,weekend,over_one_week,0.55,
+Midterm Stress Buster,food_social,160,160,18,midterm_week,one_day_before,0.6,
+Python Bootcamp Day 1,academic_workshop,55,55,6,prime_time,two_to_seven_days,0.9,
+Club President Summit,club_meeting,45,45,10,monday_morning,over_two_weeks,0.7,0.58
+International Food Festival,food_social,280,280,22,prime_time,over_one_week,0.65,
+Mock Interview Day,career_fair,75,75,5,prime_time,one_day_before,0.85,0.70

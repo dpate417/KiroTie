@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EventWise — Datasets</title>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="logo">📊</span>
+      <span class="brand-name">EventWise</span>
+      <span class="brand-tag">by KiroTie</span>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/organizer" class="nav-link">Organizer</a>
+      <a href="/student" class="nav-link">Student</a>
+      <a href="/datasets" class="nav-link active">Datasets</a>
+    </div>
+  </nav>
+
+  <div class="datasets-page">
+    <div class="datasets-header">
+      <h1>📂 Datasets</h1>
+      <p>Download ready-to-use CSV files to test EventWise, or bring your own data in the same format.</p>
+    </div>
+
+    <!-- CSV FORMAT SPEC -->
+    <div class="result-card" style="margin-bottom:1.5rem">
+      <h3>📋 CSV Format Specification</h3>
+      <p style="color:#9ca3af; font-size:0.85rem; margin-bottom:1rem">
+        Your CSV or Excel file must include these columns. Optional columns can be left blank.
+      </p>
+      <div class="table-wrap">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th>Required</th>
+              <th>Type</th>
+              <th>Accepted Values</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>event_name</code></td>
+              <td>Optional</td>
+              <td>Text</td>
+              <td>Any string</td>
+              <td>Spring Club Fair</td>
+            </tr>
+            <tr>
+              <td><code>event_type</code></td>
+              <td><span style="color:#4ade80">✅ Required</span></td>
+              <td>Text</td>
+              <td>food_social · academic_workshop · career_fair · club_meeting · general</td>
+              <td>food_social</td>
+            </tr>
+            <tr>
+              <td><code>expected_signups</code></td>
+              <td><span style="color:#4ade80">✅ Required</span></td>
+              <td>Integer</td>
+              <td>Any number ≥ 1</td>
+              <td>120</td>
+            </tr>
+            <tr>
+              <td><code>planned_quantity</code></td>
+              <td><span style="color:#4ade80">✅ Required</span></td>
+              <td>Integer</td>
+              <td>Any number ≥ 1</td>
+              <td>120</td>
+            </tr>
+            <tr>
+              <td><code>cost_per_person</code></td>
+              <td>Optional</td>
+              <td>Number</td>
+              <td>Dollar amount (default: 15)</td>
+              <td>18</td>
+            </tr>
+            <tr>
+              <td><code>time_slot</code></td>
+              <td>Optional</td>
+              <td>Text</td>
+              <td>prime_time · monday_morning · friday_afternoon · finals_week · midterm_week · weekend</td>
+              <td>friday_afternoon</td>
+            </tr>
+            <tr>
+              <td><code>registration_timing</code></td>
+              <td>Optional</td>
+              <td>Text</td>
+              <td>same_day · one_day_before · two_to_seven_days · over_one_week · over_two_weeks</td>
+              <td>over_two_weeks</td>
+            </tr>
+            <tr>
+              <td><code>interest_match_score</code></td>
+              <td>Optional</td>
+              <td>Decimal</td>
+              <td>0.0 (low) to 1.0 (high)</td>
+              <td>0.8</td>
+            </tr>
+            <tr>
+              <td><code>historical_show_rate</code></td>
+              <td>Optional</td>
+              <td>Decimal</td>
+              <td>0.0 to 1.0 (your past show rate)</td>
+              <td>0.65</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DOWNLOADABLE DATASETS -->
+    <h2 style="margin-bottom:1rem">📥 Ready-to-Use Datasets</h2>
+    <div class="dataset-grid">
+
+      <div class="dataset-card">
+        <div class="dataset-icon">🎓</div>
+        <div class="dataset-info">
+          <div class="dataset-name">Sample Events (10 events)</div>
+          <div class="dataset-desc">Quick-start dataset with 10 mixed event types. Best for first demo.</div>
+          <div class="dataset-meta">10 rows · Mixed types · Varied timing</div>
+        </div>
+        <div class="dataset-actions">
+          <a href="/api/dataset/sample" class="btn btn-primary">⬇️ Download CSV</a>
+          <a href="/organizer" class="btn btn-secondary" onclick="loadDataset('sample')">▶️ Run in App</a>
+        </div>
+      </div>
+
+      <div class="dataset-card">
+        <div class="dataset-icon">🌵</div>
+        <div class="dataset-info">
+          <div class="dataset-name">ASU Spring Semester (20 events)</div>
+          <div class="dataset-desc">Full semester of realistic ASU campus events — club fairs, workshops, career events, socials.</div>
+          <div class="dataset-meta">20 rows · ASU-realistic · $9k+ savings expected</div>
+        </div>
+        <div class="dataset-actions">
+          <a href="/api/dataset/asu-spring" class="btn btn-primary">⬇️ Download CSV</a>
+          <a href="/organizer" class="btn btn-secondary">▶️ Run in App</a>
+        </div>
+      </div>
+
+      <div class="dataset-card">
+        <div class="dataset-icon">⚠️</div>
+        <div class="dataset-info">
+          <div class="dataset-name">Worst-Case Scenarios (7 events)</div>
+          <div class="dataset-desc">Events with the worst timing, early registrations, and low interest. Shows maximum waste exposure.</div>
+          <div class="dataset-meta">7 rows · High waste · Low show rates</div>
+        </div>
+        <div class="dataset-actions">
+          <a href="/api/dataset/worst-case" class="btn btn-primary">⬇️ Download CSV</a>
+          <a href="/organizer" class="btn btn-secondary">▶️ Run in App</a>
+        </div>
+      </div>
+
+      <div class="dataset-card">
+        <div class="dataset-icon">✅</div>
+        <div class="dataset-info">
+          <div class="dataset-name">Best-Case Scenarios (5 events)</div>
+          <div class="dataset-desc">Well-timed events with high interest and same-day registrations. Shows minimal waste.</div>
+          <div class="dataset-meta">5 rows · Low waste · High show rates</div>
+        </div>
+        <div class="dataset-actions">
+          <a href="/api/dataset/best-case" class="btn btn-primary">⬇️ Download CSV</a>
+          <a href="/organizer" class="btn btn-secondary">▶️ Run in App</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- PUBLIC DATA SOURCES -->
+    <h2 style="margin:2rem 0 1rem">🌐 Public Data Sources Used</h2>
+    <div class="sources-grid">
+
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-icon">🌿</span>
+          <span class="source-name">EPA WARM Model v16</span>
+        </div>
+        <div class="source-desc">
+          Waste Reduction Model — provides CO₂ emission factors per pound of food waste landfilled.
+          Used for our <strong>0.37 kg CO₂/lb</strong> conversion factor.
+        </div>
+        <div class="source-stat">0.37 kg CO₂ per lb food waste</div>
+        <a href="https://www.epa.gov/warm/versions-waste-reduction-model" target="_blank" class="source-link">
+          epa.gov/warm →
+        </a>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-icon">🌾</span>
+          <span class="source-name">USDA ERS 2023</span>
+        </div>
+        <div class="source-desc">
+          Economic Research Service food loss data. Provides cost-per-pound of food waste
+          at the consumer/food service level. Used for our <strong>$1.84/lb</strong> disposal cost.
+        </div>
+        <div class="source-stat">$1.84 per lb food waste cost</div>
+        <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-u-s/food-loss/" target="_blank" class="source-link">
+          ers.usda.gov →
+        </a>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-icon">🎓</span>
+          <span class="source-name">Campus Event Research</span>
+        </div>
+        <div class="source-desc">
+          Campus visit day registrations consistently show a 40–50% no-show rate industry-wide.
+          Our baseline show rates (55–72%) are derived from this research.
+        </div>
+        <div class="source-stat">40–50% no-show rate (industry)</div>
+        <a href="https://appendment.com/blog/the-education-sales-problem-nobody-talks-about-driving-atten/" target="_blank" class="source-link">
+          appendment.com →
+        </a>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-icon">📊</span>
+          <span class="source-name">GitHub: PEI Devs Meetup Data</span>
+        </div>
+        <div class="source-desc">
+          Real Meetup.com event attendance data (RSVPs vs actual attendance) from PEI Developers group.
+          Useful for validating show rate assumptions.
+        </div>
+        <div class="source-stat">Real RSVP vs attendance records</div>
+        <a href="https://github.com/peidevs/Event_Resources/blob/master/MeetUps_v2.csv" target="_blank" class="source-link">
+          github.com/peidevs →
+        </a>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-icon">📅</span>
+          <span class="source-name">Eventbrite Reports Export</span>
+        </div>
+        <div class="source-desc">
+          If your organization uses Eventbrite, export your Attendee Summary report as CSV
+          and reformat it to match EventWise's column format.
+        </div>
+        <div class="source-stat">Your own real event data</div>
+        <a href="https://www.eventbrite.com/blog/eventbrite-reports-ds00-pch/" target="_blank" class="source-link">
+          eventbrite.com/blog →
+        </a>
+      </div>
+
+      <div class="source-card">
+        <div class="source-header">
+          <span class="source-icon">🏛️</span>
+          <span class="source-name">ASU Research Data Repository</span>
+        </div>
+        <div class="source-desc">
+          ASU's open data platform for research datasets. Search for campus engagement,
+          student behavior, or event data published by ASU researchers.
+        </div>
+        <div class="source-stat">ASU-specific research data</div>
+        <a href="https://dataverse.asu.edu/" target="_blank" class="source-link">
+          dataverse.asu.edu →
+        </a>
+      </div>
+
+    </div>
+
+    <!-- BRING YOUR OWN DATA -->
+    <div class="result-card" style="margin-top:2rem; border-color:#6366f1">
+      <h3>🔧 Bring Your Own Data</h3>
+      <p style="color:#9ca3af; font-size:0.88rem; margin-bottom:1rem">
+        Have your own event history? Here's how to convert it to EventWise format.
+      </p>
+      <div class="byo-steps">
+        <div class="byo-step">
+          <span class="byo-num">1</span>
+          <span>Export your event data from Eventbrite, Google Forms, or your registration system as CSV</span>
+        </div>
+        <div class="byo-step">
+          <span class="byo-num">2</span>
+          <span>Rename your columns to match the format above (event_type, expected_signups, planned_quantity)</span>
+        </div>
+        <div class="byo-step">
+          <span class="byo-num">3</span>
+          <span>Map your event categories to: food_social · academic_workshop · career_fair · club_meeting · general</span>
+        </div>
+        <div class="byo-step">
+          <span class="byo-num">4</span>
+          <span>Upload to EventWise — the Transparency Gate will flag any rows with missing required fields</span>
+        </div>
+      </div>
+      <a href="/organizer" class="btn btn-primary" style="margin-top:1rem">Upload Your Data →</a>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <p>Built with Kiro · Kiro Spark Challenge 2025 · Economics Frame</p>
+    <p class="footer-data">Data: USDA ERS 2023 · EPA WARM Model v16 · ASU Event Services</p>
+  </footer>
+</body>
+</html>

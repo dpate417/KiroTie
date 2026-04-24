@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EventWise — Student View</title>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="logo">📊</span>
+      <span class="brand-name">EventWise</span>
+      <span class="brand-tag">by KiroTie</span>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/organizer" class="nav-link">Organizer</a>
+      <a href="/student" class="nav-link active">Student</a>
+      <a href="/datasets" class="nav-link">Datasets</a>
+    </div>
+  </nav>
+
+  <div class="page-layout">
+    <!-- INPUT PANEL -->
+    <div class="input-panel">
+      <div class="panel-header">
+        <h2>🎓 Smart Registration Check</h2>
+        <p>Let EventWise check if you can actually make it before you register</p>
+      </div>
+
+      <form id="studentForm">
+        <div class="form-group">
+          <label>Event Name</label>
+          <input type="text" id="s_event_name" placeholder="e.g. CS Club Networking Night" value="CS Club Networking Night"/>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Event Start Time</label>
+            <input type="time" id="s_event_time" value="16:00"/>
+          </div>
+          <div class="form-group">
+            <label>Day of Week</label>
+            <select id="s_day_of_week">
+              <option value="monday">Monday</option>
+              <option value="tuesday">Tuesday</option>
+              <option value="wednesday">Wednesday</option>
+              <option value="thursday" selected>Thursday</option>
+              <option value="friday">Friday</option>
+              <option value="saturday">Saturday</option>
+              <option value="sunday">Sunday</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Event Location</label>
+          <input type="text" id="s_event_location" placeholder="e.g. Memorial Union, Room 202" value="Memorial Union, Room 202"/>
+        </div>
+
+        <div class="section-divider">Your Schedule</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Last Class End Time</label>
+            <input type="time" id="s_last_class_end" value="15:50"/>
+          </div>
+          <div class="form-group">
+            <label>Last Class Location</label>
+            <input type="text" id="s_last_class_location" placeholder="e.g. ENGR A" value="ENGR A"/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Distance to Event (miles)</label>
+          <input type="number" id="s_distance" placeholder="e.g. 0.4" min="0" step="0.1" value="0.4"/>
+        </div>
+
+        <div class="section-divider">Your History</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Events Attended (recent)</label>
+            <input type="number" id="s_past_attended" placeholder="e.g. 5" min="0" value="5"/>
+          </div>
+          <div class="form-group">
+            <label>Events Missed (registered but no-show)</label>
+            <input type="number" id="s_past_no_shows" placeholder="e.g. 2" min="0" value="1"/>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Current Attendance Streak</label>
+            <input type="number" id="s_streak" placeholder="e.g. 3" min="0" value="3"/>
+          </div>
+          <div class="form-group">
+            <label>Registered How Long Ago?</label>
+            <select id="s_reg_days_ago">
+              <option value="0">Just now</option>
+              <option value="1" selected>1 day ago</option>
+              <option value="5">5 days ago</option>
+              <option value="10">10 days ago</option>
+              <option value="20">20+ days ago</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">
+          🎯 Check My Registration
+        </button>
+      </form>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="output-panel" id="studentOutput" style="display:none">
+
+      <!-- Likelihood score -->
+      <div class="result-card likelihood-card">
+        <h3>🎯 Your Attendance Likelihood</h3>
+        <div class="likelihood-visual">
+          <div class="likelihood-circle" id="likelihoodCircle">
+            <div class="likelihood-score" id="likelihoodScore">—</div>
+            <div class="likelihood-pct">%</div>
+          </div>
+          <div class="likelihood-label" id="likelihoodLabel">—</div>
+        </div>
+      </div>
+
+      <!-- Warnings -->
+      <div id="warningsSection" style="display:none">
+        <div class="result-card warning-card">
+          <h3>⚠️ Schedule Warning</h3>
+          <div id="warningsList"></div>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div id="insightsSection" style="display:none">
+        <div class="result-card insights-card">
+          <h3>💡 Personalized Tips</h3>
+          <div id="insightsList"></div>
+        </div>
+      </div>
+
+      <!-- Streak -->
+      <div id="streakSection" style="display:none">
+        <div class="result-card streak-card">
+          <h3>🔥 Attendance Streak</h3>
+          <div id="streakDisplay"></div>
+        </div>
+      </div>
+
+      <!-- Reminders -->
+      <div class="result-card reminders-card">
+        <h3>🔔 Smart Reminders</h3>
+        <p class="reminders-sub">EventWise will send these reminders on the day of the event:</p>
+        <div id="remindersList"></div>
+      </div>
+
+      <!-- Cancellation prompt -->
+      <div id="cancelSection" style="display:none">
+        <div class="result-card cancel-card">
+          <h3>❓ Having Second Thoughts?</h3>
+          <div id="cancelPrompt"></div>
+          <button class="btn btn-outline" onclick="handleCancel()">Cancel My Spot</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="studentEmptyState">
+      <div class="empty-icon">🎓</div>
+      <h3>Check your registration</h3>
+      <p>EventWise will flag conflicts, give you personalized tips, and help you actually show up</p>
+    </div>
+  </div>
+
+  <script src="/static/js/student.js"></script>
+</body>
+</html>

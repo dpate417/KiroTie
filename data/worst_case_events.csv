@@ -1,0 +1,8 @@
+event_name,event_type,expected_signups,planned_quantity,cost_per_person,time_slot,registration_timing,interest_match_score,historical_show_rate
+Friday Afternoon Lecture,academic_workshop,100,100,8,friday_afternoon,over_two_weeks,0.3,
+Finals Week Career Talk,career_fair,80,80,10,finals_week,over_two_weeks,0.4,
+Saturday Morning Seminar,academic_workshop,60,60,6,weekend,over_two_weeks,0.3,
+Monday 8am Club Meeting,club_meeting,50,50,5,monday_morning,over_two_weeks,0.3,
+Midterm Week Social,food_social,120,120,18,midterm_week,over_two_weeks,0.4,
+Friday Night Networking,career_fair,90,90,12,friday_afternoon,over_one_week,0.35,
+Weekend Workshop,academic_workshop,70,70,8,weekend,over_one_week,0.4,

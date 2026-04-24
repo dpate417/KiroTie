@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EventWise — Organizer Dashboard</title>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="logo">📊</span>
+      <span class="brand-name">EventWise</span>
+      <span class="brand-tag">by KiroTie</span>
+    </div>
+    <div class="nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/organizer" class="nav-link active">Organizer</a>
+      <a href="/student" class="nav-link">Student</a>
+      <a href="/datasets" class="nav-link">Datasets</a>
+    </div>
+  </nav>
+
+  <div class="page-layout">
+    <!-- INPUT PANEL -->
+    <div class="input-panel">
+      <div class="panel-header">
+        <h2>📋 Event Details</h2>
+        <p>Fill in your event info to get a data-backed attendance prediction</p>
+      </div>
+
+      <!-- TAB SWITCHER -->
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchTab('manual')">✏️ Manual Entry</button>
+        <button class="tab-btn" onclick="switchTab('upload')">📂 Upload CSV / Excel</button>
+      </div>
+
+      <!-- MANUAL FORM -->
+      <div id="manualTab">
+      <form id="predictForm">
+        <div class="form-group">
+          <label>Event Name</label>
+          <input type="text" id="event_name" placeholder="e.g. Spring Club Fair" />
+        </div>
+
+        <div class="form-group">
+          <label>Event Type <span class="required">*</span></label>
+          <select id="event_type" required>
+            <option value="">Select type...</option>
+            <option value="food_social">🍕 Food / Social Event</option>
+            <option value="academic_workshop">📚 Academic Workshop / Lecture</option>
+            <option value="career_fair">💼 Career Fair / Networking</option>
+            <option value="club_meeting">🎯 Club / Org Meeting</option>
+            <option value="general">📅 General Campus Event</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Expected Signups <span class="required">*</span></label>
+            <input type="number" id="expected_signups" placeholder="e.g. 120" min="1" required/>
+          </div>
+          <div class="form-group">
+            <label>Planned Quantity <span class="required">*</span></label>
+            <input type="number" id="planned_quantity" placeholder="e.g. 120" min="1" required/>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Cost Per Person ($)</label>
+          <input type="number" id="cost_per_person" placeholder="e.g. 15" min="0" step="0.5" value="15"/>
+        </div>
+
+        <div class="form-group">
+          <label>Time Slot</label>
+          <select id="time_slot">
+            <option value="prime_time">⭐ Prime Time (Tue/Wed/Thu midday)</option>
+            <option value="monday_morning">Monday Morning</option>
+            <option value="friday_afternoon">Friday Afternoon</option>
+            <option value="finals_week">Finals Week</option>
+            <option value="midterm_week">Midterm Week</option>
+            <option value="weekend">Weekend</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Registration Timing</label>
+          <select id="registration_timing">
+            <option value="same_day">Same day</option>
+            <option value="one_day_before">1 day before</option>
+            <option value="two_to_seven_days" selected>2–7 days before</option>
+            <option value="over_one_week">1–2 weeks before</option>
+            <option value="over_two_weeks">2+ weeks before</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Interest Match Score</label>
+          <div class="slider-row">
+            <input type="range" id="interest_match_score" min="0" max="1" step="0.1" value="0.5"/>
+            <span id="interest_label">Medium</span>
+          </div>
+          <div class="slider-hints">
+            <span>Low (random signups)</span>
+            <span>High (target audience)</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Your Historical Show Rate (optional)</label>
+          <input type="number" id="historical_show_rate" placeholder="e.g. 0.65 for 65%" min="0" max="1" step="0.01"/>
+          <small>Leave blank to use verified baseline data</small>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" id="predictBtn">
+          ⚙️ Predict Attendance & Reveal Hidden Costs
+        </button>
+      </form>
+      </div><!-- end manualTab -->
+
+      <!-- UPLOAD TAB -->
+      <div id="uploadTab" style="display:none">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📂</div>
+          <div class="upload-title">Drop your CSV or Excel file here</div>
+          <div class="upload-sub">or click to browse</div>
+          <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" style="display:none"/>
+        </div>
+
+        <div class="upload-format">
+          <strong>Required columns:</strong>
+          <code>event_name, event_type, expected_signups, planned_quantity, cost_per_person, time_slot, registration_timing, interest_match_score</code>
+          <br/>
+          <strong>event_type values:</strong>
+          <code>food_social, academic_workshop, career_fair, club_meeting, general</code>
+        </div>
+
+        <a href="/api/sample-csv" class="btn btn-secondary btn-full" style="margin-top:0.75rem">
+          ⬇️ Download Sample CSV
+        </a>
+
+        <button class="btn btn-primary btn-full" id="uploadBtn" onclick="uploadFile()" disabled>
+          ⚙️ Predict All Events
+        </button>
+      </div>
+    </div>
+
+    <!-- OUTPUT PANEL -->
+    <div class="output-panel" id="outputPanel" style="display:none">
+
+      <!-- Gate status -->
+      <div class="gate-badge" id="gateBadge">
+        ✅ Transparency Gate: APPROVED — Prediction grounded in verified data
+      </div>
+
+      <!-- Prediction -->
+      <div class="result-card prediction-card">
+        <h3>📊 Attendance Prediction</h3>
+        <div class="prediction-visual">
+          <div class="big-number" id="predictedNum">—</div>
+          <div class="prediction-label">expected attendees</div>
+          <div class="confidence-range" id="confidenceRange">Range: — to —</div>
+          <div class="confidence-badge" id="confidenceBadge">— confidence</div>
+        </div>
+
+        <div class="vs-row">
+          <div class="vs-item">
+            <div class="vs-num planned" id="plannedNum">—</div>
+            <div class="vs-label">Planned for</div>
+          </div>
+          <div class="vs-arrow">→</div>
+          <div class="vs-item">
+            <div class="vs-num predicted" id="predictedNum2">—</div>
+            <div class="vs-label">Recommend ordering for</div>
+          </div>
+          <div class="vs-item">
+            <div class="vs-num saved" id="overPrepNum">—</div>
+            <div class="vs-label">Over-prepared by</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Economics reveal -->
+      <div class="result-card economics-card">
+        <h3>💰 Hidden Costs Revealed</h3>
+        <p class="economics-sub">This is what over-preparation actually costs — costs most organizers never see</p>
+        <div class="cost-breakdown" id="costBreakdown"></div>
+        <div class="total-savings">
+          <span>Total savings if you order for predicted attendance:</span>
+          <span class="total-amount" id="totalSavings">$—</span>
+        </div>
+        <div class="data-badge">
+          📌 <span id="dataSource">USDA ERS 2023 · EPA WARM Model</span>
+        </div>
+      </div>
+
+      <!-- Environmental impact -->
+      <div class="result-card env-card">
+        <h3>🌍 Environmental Impact</h3>
+        <div class="env-row">
+          <div class="env-item">
+            <div class="env-num" id="foodWasteLbs">—</div>
+            <div class="env-label">lbs food waste saved</div>
+          </div>
+          <div class="env-item">
+            <div class="env-num" id="co2Saved">—</div>
+            <div class="env-label">kg CO₂ equivalent saved</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Semester projection -->
+      <div class="result-card projection-card">
+        <h3>📈 Semester Projection</h3>
+        <p>If you apply EventWise to 20 similar events this semester:</p>
+        <div class="projection-row">
+          <div class="proj-item">
+            <div class="proj-num" id="semesterSavings">$—</div>
+            <div class="proj-label">Total savings</div>
+          </div>
+          <div class="proj-item">
+            <div class="proj-num" id="semesterCO2">—</div>
+            <div class="proj-label">kg CO₂ avoided</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Factors -->
+      <div class="result-card factors-card">
+        <h3>⚙️ Prediction Factors</h3>
+        <div id="factorsList"></div>
+      </div>
+
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">📊</div>
+      <h3>Fill in your event details</h3>
+      <p>EventWise will reveal the hidden economic cost of over-preparation</p>
+    </div>
+
+    <!-- BULK RESULTS (CSV upload) -->
+    <div id="bulkPanel" style="display:none">
+      <div class="gate-badge" id="bulkGateBadge">
+        ✅ Transparency Gate: APPROVED — All predictions grounded in verified data
+      </div>
+
+      <!-- Summary card -->
+      <div class="result-card prediction-card">
+        <h3>📊 Bulk Prediction Summary</h3>
+        <div class="bulk-summary-row" id="bulkSummary"></div>
+      </div>
+
+      <!-- Per-event table -->
+      <div class="result-card">
+        <h3>📋 Event-by-Event Results</h3>
+        <div class="table-wrap">
+          <table class="results-table" id="bulkTable">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Signups</th>
+                <th>Predicted</th>
+                <th>Show Rate</th>
+                <th>Over-prep</th>
+                <th>$ Saved</th>
+                <th>CO₂ Saved</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody id="bulkTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/organizer.js"></script>
+</body>
+</html>
