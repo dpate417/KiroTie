@@ -26,10 +26,17 @@
     <div class="input-panel">
       <div class="panel-header">
         <h2>🎓 Smart Registration Check</h2>
-        <p>Let EventWise check if you can actually make it before you register</p>
+        <p>Check a single student or add multiple to a list and email selected ones</p>
       </div>
 
-      <form id="studentForm">
+      <!-- TAB SWITCHER -->
+      <div class="tab-row">
+        <button class="tab-btn active" onclick="switchStudentTab('single', event)">👤 Single Check</button>
+        <button class="tab-btn" onclick="switchStudentTab('addlist', event)">➕ Add to List</button>
+      </div>
+
+      <!-- SINGLE CHECK TAB -->
+      <div id="singleTab">
         <div class="form-group">
           <label>Event Name</label>
           <input type="text" id="s_event_name" placeholder="e.g. CS Club Networking Night" value="CS Club Networking Night"/>
@@ -133,6 +140,104 @@
           🎯 Check My Registration
         </button>
       </form>
+      </div><!-- end singleTab -->
+
+      <!-- ADD TO LIST TAB -->
+      <div id="addlistTab" style="display:none">
+        <div class="addlist-form">
+          <div class="form-group">
+            <label>Student Name <span class="required">*</span></label>
+            <input type="text" id="al_name" placeholder="e.g. Dhruv Patel"/>
+          </div>
+          <div class="form-group">
+            <label>Email <span class="required">*</span></label>
+            <input type="email" id="al_email" placeholder="e.g. dpate417@asu.edu"/>
+          </div>
+          <div class="form-group">
+            <label>Event Name</label>
+            <input type="text" id="al_event_name" placeholder="e.g. UI/UX Workshop" value="UI/UX Design Workshop"/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Event Time</label>
+              <input type="time" id="al_event_time" value="16:15"/>
+            </div>
+            <div class="form-group">
+              <label>Last Class End</label>
+              <input type="time" id="al_last_class_end" value="15:50"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Event Location</label>
+              <input type="text" id="al_event_location" placeholder="e.g. Memorial Union" value="Memorial Union"/>
+            </div>
+            <div class="form-group">
+              <label>Last Class Location</label>
+              <input type="text" id="al_last_class_location" placeholder="e.g. ENGR A" value="ENGR A"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Distance (miles)</label>
+              <input type="number" id="al_distance" value="0.4" step="0.1" min="0"/>
+            </div>
+            <div class="form-group">
+              <label>Day of Week</label>
+              <select id="al_day">
+                <option value="monday">Monday</option>
+                <option value="tuesday">Tuesday</option>
+                <option value="wednesday">Wednesday</option>
+                <option value="thursday" selected>Thursday</option>
+                <option value="friday">Friday</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Major</label>
+              <input type="text" id="al_major" placeholder="e.g. Computer Science" value="Computer Science"/>
+            </div>
+            <div class="form-group">
+              <label>Event Topic</label>
+              <input type="text" id="al_topic" placeholder="e.g. UI/UX Design" value="UI/UX Design"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Past Attended</label>
+              <input type="number" id="al_attended" value="5" min="0"/>
+            </div>
+            <div class="form-group">
+              <label>Past No-Shows</label>
+              <input type="number" id="al_noshows" value="1" min="0"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Interest Match</label>
+            <div class="slider-row">
+              <input type="range" id="al_interest" min="0" max="1" step="0.1" value="0.8"/>
+              <span id="al_interest_label">High</span>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="addStudentToList()">
+            ➕ Add Student to List
+          </button>
+          <div id="addListStatus" style="display:none;margin-top:0.5rem"></div>
+        </div>
+
+        <!-- STUDENT LIST -->
+        <div id="manualListSection" style="display:none;margin-top:1.25rem">
+          <div class="manual-list-header">
+            <span id="manualListCount">0 students added</span>
+            <button class="sel-btn" onclick="clearManualList()">🗑️ Clear All</button>
+          </div>
+          <div id="manualStudentList"></div>
+          <button class="btn btn-primary btn-full" id="emailListBtn" onclick="openEmailManager()" style="margin-top:0.75rem">
+            📨 Email Selected Students
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- OUTPUT PANEL -->

@@ -269,3 +269,17 @@ code { background: #0f1117; padding: 0.1rem 0.4rem; border-radius: 4px; font-siz
 .row-warning { border-left: 3px solid #f59e0b; }
 .send-toolbar { display: flex; align-items: center; justify-content: space-between; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #2d3148; flex-wrap: wrap; gap: 0.75rem; }
 .send-info { font-size: 0.85rem; color: #6b7280; }
+
+/* ===== MANUAL STUDENT LIST ===== */
+.addlist-form { display: flex; flex-direction: column; gap: 0.75rem; }
+.manual-list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; font-size: 0.85rem; font-weight: 600; color: #9ca3af; }
+.manual-student-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem; background: #0f1117; border: 1px solid #2d3148; border-radius: 8px; margin-bottom: 0.4rem; transition: border-color 0.2s; }
+.manual-student-row:has(.manual-check:checked) { border-color: #6366f1; background: #1e1b4b22; }
+.manual-check { width: 16px; height: 16px; accent-color: #6366f1; cursor: pointer; flex-shrink: 0; }
+.manual-student-info { flex: 1; min-width: 0; }
+.manual-student-name { font-weight: 600; font-size: 0.88rem; }
+.manual-student-email { font-size: 0.75rem; color: #6b7280; }
+.manual-student-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+.manual-student-warn { font-size: 0.8rem; }
+.manual-remove { background: none; border: none; color: #4b5563; cursor: pointer; font-size: 0.9rem; padding: 0.2rem 0.4rem; border-radius: 4px; flex-shrink: 0; }
+.manual-remove:hover { color: #f87171; background: #450a0a22; }

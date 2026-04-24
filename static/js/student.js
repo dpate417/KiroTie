@@ -392,3 +392,175 @@ function resetBulk() {
   document.getElementById("previewBtn").disabled = true;
   document.getElementById("step1Card").scrollIntoView({ behavior: "smooth" });
 }
+
+// ===== STUDENT TAB SWITCHER =====
+function switchStudentTab(tab, event) {
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  if (event && event.target) event.target.classList.add("active");
+  document.getElementById("singleTab").style.display = tab === "single" ? "block" : "none";
+  document.getElementById("addlistTab").style.display = tab === "addlist" ? "block" : "none";
+}
+
+// ===== MANUAL STUDENT LIST =====
+let manualStudents = [];
+
+// Interest slider
+const alInterest = document.getElementById("al_interest");
+const alInterestLabel = document.getElementById("al_interest_label");
+if (alInterest) {
+  alInterest.addEventListener("input", () => {
+    const v = parseFloat(alInterest.value);
+    alInterestLabel.textContent = v >= 0.7 ? "High" : v >= 0.4 ? "Medium" : "Low";
+  });
+}
+
+async function addStudentToList() {
+  const name = document.getElementById("al_name").value.trim();
+  const email = document.getElementById("al_email").value.trim();
+
+  if (!name || !email) {
+    showAddStatus("error", "Name and email are required.");
+    return;
+  }
+  if (!email.includes("@")) {
+    showAddStatus("error", "Please enter a valid email address.");
+    return;
+  }
+
+  const studentData = {
+    student_name: name,
+    email: email,
+    event_name: document.getElementById("al_event_name").value,
+    event_time: document.getElementById("al_event_time").value,
+    event_location: document.getElementById("al_event_location").value,
+    last_class_end_time: document.getElementById("al_last_class_end").value,
+    last_class_location: document.getElementById("al_last_class_location").value,
+    distance_miles: parseFloat(document.getElementById("al_distance").value) || 0,
+    day_of_week: document.getElementById("al_day").value,
+    student_major: document.getElementById("al_major").value,
+    event_topic: document.getElementById("al_topic").value,
+    past_attended: parseInt(document.getElementById("al_attended").value) || 0,
+    past_no_shows: parseInt(document.getElementById("al_noshows").value) || 0,
+    interest_match_score: parseFloat(document.getElementById("al_interest").value) || 0.5,
+    registration_days_ago: 1
+  };
+
+  // Get insights for this student
+  try {
+    const res = await fetch("/api/student-insights", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(studentData)
+    });
+    const insights = await res.json();
+
+    const emailBody = insights.email_preview || "";
+    const subject = emailBody.split("\n")[0].replace("Subject: ", "").trim();
+
+    const student = {
+      ...studentData,
+      likelihood: insights.attendance_likelihood.score,
+      likelihood_label: insights.attendance_likelihood.label,
+      likelihood_color: insights.attendance_likelihood.color,
+      warnings: insights.warnings ? insights.warnings.length : 0,
+      warning_messages: insights.warnings ? insights.warnings.map(w => w.message) : [],
+      email_subject: subject,
+      email_body: emailBody,
+      has_valid_email: true,
+      index: manualStudents.length
+    };
+
+    manualStudents.push(student);
+    renderManualList();
+    showAddStatus("success", `✅ ${name} added to list (${manualStudents.length} total)`);
+
+    // Clear name and email for next entry
+    document.getElementById("al_name").value = "";
+    document.getElementById("al_email").value = "";
+    document.getElementById("al_name").focus();
+
+  } catch (err) {
+    showAddStatus("error", "Could not process student. Try again.");
+  }
+}
+
+function showAddStatus(type, msg) {
+  const div = document.getElementById("addListStatus");
+  div.style.display = "block";
+  div.className = type === "success" ? "email-status-ok" : "email-status-err";
+  div.textContent = msg;
+  setTimeout(() => { div.style.display = "none"; }, 3000);
+}
+
+function renderManualList() {
+  const section = document.getElementById("manualListSection");
+  section.style.display = "block";
+  document.getElementById("manualListCount").textContent = `${manualStudents.length} student${manualStudents.length !== 1 ? 's' : ''} added`;
+
+  const list = document.getElementById("manualStudentList");
+  list.innerHTML = manualStudents.map((s, i) => {
+    const lColor = s.likelihood >= 70 ? "#4ade80" : s.likelihood >= 45 ? "#fb923c" : "#f87171";
+    const warnBadge = s.warnings > 0 ? `⚠️ ${s.warnings}` : "✅";
+    return `<div class="manual-student-row" id="mrow-${i}">
+      <input type="checkbox" class="manual-check" data-index="${i}" checked onchange="updateManualCount()"/>
+      <div class="manual-student-info">
+        <div class="manual-student-name">${s.student_name}</div>
+        <div class="manual-student-email">${s.email}</div>
+      </div>
+      <div class="manual-student-meta">
+        <span style="color:${lColor};font-weight:600;font-size:0.8rem">${s.likelihood}%</span>
+        <span style="font-size:0.75rem;color:#6b7280">${s.likelihood_label}</span>
+      </div>
+      <div class="manual-student-warn" style="font-size:0.8rem">${warnBadge}</div>
+      <button class="manual-remove" onclick="removeStudent(${i})" title="Remove">✕</button>
+    </div>`;
+  }).join("");
+
+  updateManualCount();
+}
+
+function updateManualCount() {
+  const checked = document.querySelectorAll(".manual-check:checked").length;
+  const btn = document.getElementById("emailListBtn");
+  btn.textContent = checked > 0
+    ? `📨 Email ${checked} Selected Student${checked !== 1 ? 's' : ''}`
+    : "📨 Email Selected Students";
+  btn.disabled = checked === 0;
+}
+
+function removeStudent(index) {
+  manualStudents.splice(index, 1);
+  // Re-index
+  manualStudents.forEach((s, i) => s.index = i);
+  if (manualStudents.length === 0) {
+    document.getElementById("manualListSection").style.display = "none";
+  } else {
+    renderManualList();
+  }
+}
+
+function clearManualList() {
+  manualStudents = [];
+  document.getElementById("manualListSection").style.display = "none";
+}
+
+async function openEmailManager() {
+  const checked = document.querySelectorAll(".manual-check:checked");
+  if (checked.length === 0) return;
+
+  const selected = Array.from(checked).map(cb => manualStudents[parseInt(cb.dataset.index)]);
+
+  // Load them into the step2 table and show it
+  allStudents = selected.map((s, i) => ({ ...s, index: i }));
+  renderStudentTable(allStudents);
+
+  // Scroll to and show the email manager
+  document.getElementById("step1Card").style.display = "none";
+  document.getElementById("step2Card").style.display = "block";
+  document.getElementById("step3Card").style.display = "none";
+
+  // Pre-check all
+  selectAll();
+
+  document.querySelector(".bulk-email-section").scrollIntoView({ behavior: "smooth" });
+}
