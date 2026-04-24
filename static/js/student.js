@@ -259,9 +259,7 @@ function renderStudentTable(students) {
       : `<span style="color:#4b5563;font-size:0.75rem">—</span>`;
 
     return `<tr id="row-${i}" class="${s.warnings > 0 ? 'row-warning' : ''}">
-      <td><input type="checkbox" class="student-check" data-index="${i}"
-          ${!s.has_valid_email ? 'disabled title="No valid email"' : ''}
-          onchange="updateCount()"/></td>
+      <td><input type="checkbox" class="student-check" data-index="${i}" onchange="updateCount()"/></td>
       <td><strong>${s.student_name}</strong></td>
       <td style="font-size:0.8rem;color:#6b7280">${s.email || '—'} ${emailBadge}</td>
       <td style="font-size:0.85rem">${s.event_name}</td>
@@ -275,12 +273,12 @@ function renderStudentTable(students) {
 
 // ===== CHECKBOX HELPERS =====
 function toggleAll(master) {
-  document.querySelectorAll(".student-check:not(:disabled)").forEach(cb => cb.checked = master.checked);
+  document.querySelectorAll(".student-check").forEach(cb => cb.checked = master.checked);
   updateCount();
 }
 
 function selectAll() {
-  document.querySelectorAll(".student-check:not(:disabled)").forEach(cb => cb.checked = true);
+  document.querySelectorAll(".student-check").forEach(cb => cb.checked = true);
   document.getElementById("masterCheck").checked = true;
   updateCount();
 }
@@ -293,7 +291,7 @@ function selectNone() {
 
 function selectLowLikelihood() {
   document.querySelectorAll(".student-check").forEach(cb => cb.checked = false);
-  document.querySelectorAll(".student-check:not(:disabled)").forEach(cb => {
+  document.querySelectorAll(".student-check").forEach(cb => {
     const idx = parseInt(cb.dataset.index);
     if (allStudents[idx].likelihood < 60) cb.checked = true;
   });
@@ -302,7 +300,7 @@ function selectLowLikelihood() {
 
 function selectWithWarnings() {
   document.querySelectorAll(".student-check").forEach(cb => cb.checked = false);
-  document.querySelectorAll(".student-check:not(:disabled)").forEach(cb => {
+  document.querySelectorAll(".student-check").forEach(cb => {
     const idx = parseInt(cb.dataset.index);
     if (allStudents[idx].warnings > 0) cb.checked = true;
   });
@@ -333,6 +331,17 @@ async function sendSelectedEmails() {
     const idx = parseInt(cb.dataset.index);
     return allStudents[idx];
   });
+
+  // Warn about missing emails but continue
+  const missing = selected.filter(s => !s.has_valid_email || !s.email);
+  if (missing.length > 0) {
+    const names = missing.map(s => s.student_name).join(", ");
+    if (!confirm(`${missing.length} student(s) have no email address: ${names}\n\nThey will be skipped. Continue?`)) {
+      btn.textContent = "📨 Send to Selected Students";
+      btn.disabled = false;
+      return;
+    }
+  }
 
   try {
     const res = await fetch("/api/send-selected", {
