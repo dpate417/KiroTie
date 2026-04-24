@@ -1,60 +1,149 @@
-# KiroTie
-KiroTie
-EventWise — Problem Statement & Solution
-Problem Statement
-Campus event organizers at ASU consistently over-prepare for events because they rely on registration numbers alone to plan resources. Registration does not equal attendance.
+# EventWise
 
-Students register for events they never show up to — due to schedule conflicts, competing priorities, or simple disengagement. This leads to significant waste in food, printed materials, reserved space, and staff time. Organizers have no reliable way to anticipate actual turnout, so they default to worst-case preparation every time.
+> AI-powered attendance intelligence for campus events.
 
-The Data Backs This Up
-Free campus events — like most ASU student organization events — see a 40–50% no-show rate, meaning nearly half of registered students simply don't show up (appendment.com, tixfox.co)
-The average in-person event attendance rate sits at only 68% across all event types — and campus events typically perform worse (nunify.com)
-U.S. college campuses generate an estimated 22 million pounds of food waste annually, much of it tied to over-preparation at catered events (stonepierpress.org)
-A 1-in-3 students spends zero time weekly on extracurricular activities, yet still registers for events out of initial interest (insidehighered.com)
-Students who attend 10+ campus events per semester are 13% more likely to persist and stay enrolled — meaning low attendance is not just a waste problem, it's a retention problem (moderncampus.com)
-The core issue is a broken feedback loop: organizers over-prepare because they can't predict turnout, and students under-attend because no one is helping them follow through on their own intentions.
+EventWise helps organizers estimate real turnout — not just registrations — and helps students actually show up.
 
-Solution
-EventWise is a two-sided AI tool that predicts real event attendance for organizers and sends personalized engagement emails to students — increasing the probability that registered students actually show up.
+---
 
-Side 1 — Organizer: Attendance Prediction
-When students register for an event, EventWise analyzes each registrant against multiple behavioral and contextual signals to generate a realistic attendance forecast.
+## The Problem
 
-Data signals used for prediction:
+Campus event organizers plan for 100% of signups. On average, only 60–70% show up. The result: wasted food, over-reserved space, excess printed materials, and staff time that didn't need to be spent.
 
-Signal	How It's Used
-ASU Class Schedule	Checks for schedule conflicts on the day of the event. A student with a class ending 10 min before a cross-campus event is flagged as low-likelihood.
-No-Show History	Students with a pattern of registering but not attending past events receive a lower attendance probability score.
-Student Interests & Major	If the event topic aligns with the student's declared interests or field of study, their likelihood score increases.
-Event Timing	Day of week, time of day, and proximity to finals or breaks are factored in. Friday afternoon events and exam-week events historically underperform.
-Registration Timing	Students who register the day before or morning of the event are more likely to attend than those who registered weeks in advance.
-Output to the organizer:
+Registration does not equal attendance.
 
-Predicted attendance count (e.g., "68 of 120 registrants expected")
-Confidence range (e.g., 60–75)
-Suggested resource quantities — food portions, seating, printed materials
-Risk breakdown explaining what's driving the estimate
-Side 2 — Student: Personalized Engagement Emails
-This is where EventWise closes the gap between intent and action. Rather than sending a generic reminder, EventWise generates a personalized email for each registered student based on their specific situation that day.
+---
 
-Why this works: Personalized outreach drives a 26% increase in engagement compared to generic messaging (moldstud.com), and well-timed reminder emails can boost attendance by 30–50% (instantly.ai). Research also shows personalized reminders reduce no-shows by up to 35% (hitemupapp.com).
+## The Solution
 
-What the personalized email includes:
+EventWise is a two-sided tool. Organizers get data-backed attendance predictions. Students get smart, context-aware nudges that close the gap between signing up and showing up.
 
-Schedule awareness — "Your last class today ends at 3:50 PM. The event starts at 4:15 PM at the MU — you have just enough time to make it."
-Interest alignment — "This workshop is on UI/UX design, which matches your interest in Human-Computer Interaction."
-Conflict flag — "Heads up: you have a class that overlaps with the first 20 minutes. The event runs until 6 PM so you can still catch most of it."
-Logistics nudge — "The venue is a 12-minute walk from your last class. Leave by 3:55 PM."
-Soft cancellation prompt (if high conflict) — "It looks like today might be tough. If you can't make it, canceling your spot helps the organizer plan better — one tap to cancel."
-Email timing:
+---
 
-48 hours before: interest-based reminder
-Morning of the event: schedule-aware nudge with logistics
-1 hour before: final reminder with location and timing
-Impact Summary
-Metric	Without EventWise	With EventWise
-Organizer planning basis	Registration count	Predicted attendance
-Food/resource waste	Prepared for 100%, used by ~60%	Prepared for predicted 65–70%
-Student no-show rate	40–50% (free events)	Targeted reduction of up to 35%
-Student engagement	Generic or no reminders	Personalized, schedule-aware emails
-EventWise doesn't just predict who will show up — it actively increases the number of people who do.
+## Organizer Side — Event Dashboard
+
+EventWise gives organizers a card-based view of all their events, so they can quickly understand performance and take action.
+
+Each event card shows:
+
+- **Predicted attendance** (e.g. 68 of 120)
+- **Signup trend** — growing, slowing, or stagnant
+- **Competing events** at the same time slot
+- **Key risk factors** — schedule conflicts, poor timing, low interest match, school calendar conflicts (finals, spring break, midterms, holiday weekends)
+
+### Suggested actions
+
+Instead of just showing data, EventWise surfaces immediate actions directly on each card:
+
+| Action | When it's suggested |
+|---|---|
+| Adjust event timing | Poor time slot or school calendar conflict |
+| Target a better audience | Low interest alignment across registrants |
+| Reduce over-preparation | High predicted no-show rate |
+| Increase outreach | Signup trend slowing or stagnant |
+
+Each suggestion is a quick action — triggerable directly from the event card without leaving the dashboard.
+
+### Goal
+
+Help organizers quickly see which events are at risk and take simple steps to improve real attendance before it's too late.
+
+---
+
+## Student Side — Schedule-aware Event View
+
+EventWise helps students understand which events they are realistically able to attend by showing events directly in the context of their schedule.
+
+Instead of sending reminders, the system provides a simple calendar view that highlights recommended and conflicting events based on each student's actual day.
+
+Each event is annotated using:
+
+- **Schedule availability** — does the event fit naturally around the student's classes?
+- **Interest alignment** — does the event topic match the student's declared interests or major?
+- **Potential conflicts** — overlapping classes, tight transitions, or high-stress academic periods
+
+### Color coding
+
+| Color | Meaning |
+|---|---|
+| 🟢 Green | High likelihood — good timing + strong interest match |
+| 🟡 Yellow | Medium — minor conflict or weaker interest |
+| 🔴 Red | Low likelihood — schedule conflict or poor timing |
+
+Students can quickly see:
+- Which events fit naturally into their day
+- Which events may be difficult to attend
+- Which signups they should reconsider
+
+---
+
+## Authentication — Mock ASU SSO
+
+EventWise uses a single login entry point for both organizers and students, simulating ASU's CAS (Central Authentication Service) SSO.
+
+- All users log in via a single `/login` page using their ASU email (`@asu.edu`)
+- Role is automatically assigned based on the account type:
+  - **Organizer** — accounts flagged as organizers at login
+  - **Student** — all other ASU accounts
+- After login, users are redirected to their respective dashboard (organizer view or student view)
+- No real CAS integration — mock flow designed for demo purposes
+
+---
+
+## Economics Frame — Savings as a Feature
+
+Instead of showing raw cost tables, EventWise surfaces the economics as a value proposition — what the organizer *saved* by planning smarter.
+
+### Savings Banner (per event card)
+Each event card shows an estimated savings figure based on predicted no-shows:
+
+```
+🟢 Estimated savings this event: $124
+   Based on 18 predicted no-shows × avg. $6.90/person waste cost
+```
+
+### Inline Citation Tooltips
+Every cost figure includes a small inline citation so the data is traceable without cluttering the UI:
+
+```
+Predicted waste cost: $47.20  ⓘ  (USDA ERS 2023, ASU Event Services)
+```
+
+Hovering the ⓘ icon reveals the full source — food waste disposal ($1.84/lb, USDA ERS 2023), space over-reservation (~$3.50/person, ASU Event Services), staff (~$2.00/person), and printed materials (~$1.25/person).
+
+This satisfies the Economics Frame transparency guardrail while making the data feel like a product feature, not a compliance footnote.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Python / Flask |
+| Frontend | React + Vite |
+| Styling | Tailwind CSS + shadcn/ui |
+| API | Flask REST (JSON) |
+| Data | `data/event_baselines.json` — verified baseline rates and economic constants |
+
+---
+
+## How to Run
+
+**Backend**
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+**Frontend**
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Open `http://localhost:5173`
+
+---
+
+Built for the ASU Kiro Spark Challenge · April 2026
