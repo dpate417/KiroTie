@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import WasteCostBanner from '@/components/WasteCostBanner'
+import { apiPost } from '@/api/client'
 
 const TREND_STYLES = {
   growing:  'bg-green-100 text-green-700 border-green-200',
@@ -11,62 +14,70 @@ const TREND_LABELS = {
   growing: '↑ Growing', slowing: '↓ Slowing', stagnant: '→ Stagnant',
 }
 
-// Short chip labels — no long sentences
 const RISK_CHIP_STYLES = {
-  competing_event:  'bg-red-50 text-red-600 border-red-200',
-  academic_conflict:'bg-orange-50 text-orange-600 border-orange-200',
-  poor_time_slot:   'bg-yellow-50 text-yellow-600 border-yellow-200',
-  low_interest:     'bg-blue-50 text-blue-600 border-blue-200',
+  competing_event:   'bg-red-50 text-red-600 border-red-200',
+  academic_conflict: 'bg-orange-50 text-orange-600 border-orange-200',
+  poor_time_slot:    'bg-yellow-50 text-yellow-600 border-yellow-200',
+  low_interest:      'bg-blue-50 text-blue-600 border-blue-200',
 }
 const RISK_SHORT_LABELS = {
-  competing_event:  'Competing event',
-  academic_conflict:'Finals week',
-  poor_time_slot:   'Low-traffic day',
-  low_interest:     'Low interest',
+  competing_event:   'Competing event',
+  academic_conflict: 'Finals week',
+  poor_time_slot:    'Low-traffic day',
+  low_interest:      'Low interest',
 }
 
 /**
- * Derive up to 2 insight→action pairs from prediction signals.
- * Priority order matches the mapping rules.
+ * Build the list of quick actions to show based on risk factors and no-show rate.
+ * Req 2.9–2.12
+ *
+ * Returns an array of { label, actionType } objects (max 2, deduplicated).
  */
-function getInsightActions({ risk_factors, signup_trend, predicted_count, signup_count }) {
-  const pairs = []
+function getQuickActions({ risk_factors = [], signup_trend, predicted_count, signup_count }) {
+  const actions = []
 
-  const hasCompeting  = risk_factors.some((r) => r.type === 'competing_event')
-  const hasAcademic   = risk_factors.some((r) => r.type === 'academic_conflict')
   const hasPoorSlot   = risk_factors.some((r) => r.type === 'poor_time_slot')
+  const hasAcademic   = risk_factors.some((r) => r.type === 'academic_conflict')
   const hasLowInterest= risk_factors.some((r) => r.type === 'low_interest')
-  const dropPct       = signup_count > 0 ? (signup_count - predicted_count) / signup_count : 0
 
-  if (hasCompeting) {
-    pairs.push({ insight: 'Competing events at this time', action: 'Adjust timing', impact: '+10–15%', sub: 'reduces conflicts' })
+  // Req 2.9 — adjust timing when poor_time_slot or academic_conflict
+  if (hasPoorSlot || hasAcademic) {
+    actions.push({ label: 'Adjust event timing', actionType: 'adjust_timing' })
   }
-  if (hasAcademic || hasPoorSlot) {
-    pairs.push({ insight: 'Schedule conflict for many attendees', action: 'Adjust timing', impact: '+10–15%', sub: 'reduces conflicts' })
-  }
-  if (signup_trend === 'slowing' || signup_trend === 'stagnant') {
-    pairs.push({ insight: 'Signups are slowing down', action: 'Increase outreach', impact: '+10–20%', sub: `~${Math.round(signup_count * 0.12)} more attendees` })
-  }
+
+  // Req 2.10 — target audience when low_interest
   if (hasLowInterest) {
-    pairs.push({ insight: 'Low audience match', action: 'Target better audience', impact: '+15%', sub: 'better-fit attendees' })
-  }
-  if (dropPct >= 0.25) {
-    pairs.push({ insight: 'Large attendance drop expected', action: 'Send reminders', impact: '+10%', sub: `~${Math.round(signup_count * 0.10)} recovered` })
+    actions.push({ label: 'Target a better audience', actionType: 'target_audience' })
   }
 
-  // Deduplicate by action, cap at 2
+  // Req 2.11 — reduce over-preparation when predicted no-show rate > 20%
+  const noShowRate = signup_count > 0 ? (signup_count - predicted_count) / signup_count : 0
+  if (noShowRate > 0.20) {
+    actions.push({ label: 'Reduce over-preparation', actionType: 'reduce_over_preparation' })
+  }
+
+  // Req 2.12 — increase outreach when signup_trend is slowing or stagnant
+  if (signup_trend === 'slowing' || signup_trend === 'stagnant') {
+    actions.push({ label: 'Increase outreach', actionType: 'increase_outreach' })
+  }
+
+  // Deduplicate by actionType, cap at 2
   const seen = new Set()
-  return pairs.filter(({ action }) => {
-    if (seen.has(action)) return false
-    seen.add(action)
+  return actions.filter(({ actionType }) => {
+    if (seen.has(actionType)) return false
+    seen.add(actionType)
     return true
   }).slice(0, 2)
 }
 
 export default function EventCard({ event, prediction, wasteInsight }) {
-  const { name, date, time, location, signup_count } = event
+  const { id, name, date, time, location, signup_count } = event
   const { predicted_count, likelihood, risk_factors = [], signup_trend } = prediction
-  const { overPrepGap, wastedCostUsd, recommendedPrep, savingsIfAdjustedUsd, sources = [] } = wasteInsight
+  const { overPrepGap, wastedCostUsd, recommendedPrep, savingsIfAdjustedUsd, sources = [] } = wasteInsight ?? {}
+
+  const [actionResult, setActionResult]   = useState(null)   // recommendation string
+  const [actionError, setActionError]     = useState(null)
+  const [pendingAction, setPendingAction] = useState(null)   // actionType currently in-flight
 
   const formattedDate = date
     ? new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
@@ -76,12 +87,26 @@ export default function EventCard({ event, prediction, wasteInsight }) {
     ? Math.round(((signup_count - predicted_count) / signup_count) * 100)
     : 0
 
-  const insightActions = getInsightActions({ risk_factors, signup_trend, predicted_count, signup_count })
+  const quickActions = getQuickActions({ risk_factors, signup_trend, predicted_count, signup_count })
+
+  async function handleAction(actionType) {
+    setPendingAction(actionType)
+    setActionResult(null)
+    setActionError(null)
+    try {
+      const res = await apiPost(`/events/${id}/actions`, { action_type: actionType })
+      const recommendation = res?.data?.recommendation ?? res?.recommendation ?? 'Action submitted.'
+      setActionResult(recommendation)
+    } catch (err) {
+      setActionError('Could not complete action. Please try again.')
+    } finally {
+      setPendingAction(null)
+    }
+  }
 
   return (
     <Card className="w-full bg-white border border-gray-200 hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
-        {/* Event title + trend badge */}
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-base font-semibold leading-snug text-gray-900">{name}</CardTitle>
           {signup_trend && (
@@ -90,7 +115,6 @@ export default function EventCard({ event, prediction, wasteInsight }) {
             </Badge>
           )}
         </div>
-        {/* Meta — small, light */}
         <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-400 mt-0.5">
           {formattedDate && <span>{formattedDate}</span>}
           {time && <span>{time}</span>}
@@ -117,7 +141,6 @@ export default function EventCard({ event, prediction, wasteInsight }) {
           {dropPct > 0 && (
             <span className="text-xs text-gray-400 font-normal">({signup_count} RSVPs, −{dropPct}%)</span>
           )}
-          {/* Risk level — minimal */}
           {likelihood && (
             <span className={`ml-auto text-xs font-medium px-1.5 py-0.5 rounded ${
               likelihood === 'High'   ? 'text-green-600 bg-green-50' :
@@ -129,7 +152,7 @@ export default function EventCard({ event, prediction, wasteInsight }) {
           )}
         </div>
 
-        {/* 3. Risk factor chips — short labels only */}
+        {/* 3. Risk factor chips */}
         {risk_factors.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {risk_factors.map((rf, i) => (
@@ -150,25 +173,37 @@ export default function EventCard({ event, prediction, wasteInsight }) {
           </p>
         )}
 
-        {/* Insight → Action pairs (max 2, always visible) */}
-        {insightActions.length > 0 && (
+        {/* Quick action buttons — Req 2.8–2.12 */}
+        {quickActions.length > 0 && (
           <div className="space-y-1.5 pt-1 border-t border-gray-100">
-            {insightActions.map(({ insight, action, impact, sub }) => (
-              <div key={action} className="flex items-center justify-between gap-2">
-                <span className="text-xs text-gray-500 leading-tight">{insight}</span>
+            {quickActions.map(({ label, actionType }) => (
+              <div key={actionType} className="flex items-center justify-end">
                 <button
-                  onClick={() => console.log('Action:', action)}
-                  className="shrink-0 flex flex-col items-end text-right focus:outline-none group"
+                  onClick={() => handleAction(actionType)}
+                  disabled={pendingAction === actionType}
+                  className="shrink-0 text-xs font-semibold text-blue-600 hover:text-blue-800 disabled:opacity-50 transition-colors focus:outline-none"
                 >
-                  <span className="text-xs font-semibold text-blue-600 group-hover:text-blue-800 transition-colors">
-                    {action} <span className="text-green-600">{impact}</span>
-                  </span>
-                  {sub && <span className="text-[10px] text-gray-400">{sub}</span>}
+                  {pendingAction === actionType ? 'Loading…' : label}
                 </button>
               </div>
             ))}
           </div>
         )}
+
+        {/* Action result alert */}
+        {actionResult && (
+          <Alert className="mt-2 border-blue-200 bg-blue-50 text-blue-800">
+            <AlertDescription>{actionResult}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Action error alert */}
+        {actionError && (
+          <Alert className="mt-2 border-red-200 bg-red-50 text-red-700">
+            <AlertDescription>{actionError}</AlertDescription>
+          </Alert>
+        )}
+
       </CardContent>
     </Card>
   )

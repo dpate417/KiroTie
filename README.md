@@ -103,22 +103,79 @@ Single login for both organizers and students, simulating ASU's CAS SSO.
 
 ---
 
-## How to Run
+## Environment Requirements
 
-**Backend**
-```bash
+| | |
+|---|---|
+| **Python** | 3.12 (required) |
+| **Node** | 18+ (recommended) |
+| **OS tested** | Windows, macOS |
+
+---
+
+## Backend Setup (Flask)
+
+**Windows**
+```bat
+py -3.12 -m venv venv
+venv\Scripts\activate
 pip install -r requirements.txt
-python app.py
+py -3.12 app.py
 ```
 
-**Frontend**
+**macOS / Linux**
+```bash
+python3.12 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python3.12 app.py
+```
+
+Expected output:
+```
+ * Running on http://127.0.0.1:5000
+```
+
+---
+
+## Frontend Setup (Vite)
+
 ```bash
 cd client
 npm install
 npm run dev
 ```
 
-Open `http://localhost:5173`
+Expected output:
+```
+  Local:   http://localhost:5173
+```
+
+---
+
+## Demo Access
+
+Open `http://localhost:5173` — you will be redirected to the login page.
+
+| Role | Email | Redirects to |
+|---|---|---|
+| Organizer | `organizer@asu.edu` | `/dashboard` |
+| Student | `student@asu.edu` | `/calendar` |
+
+- No password required
+- Email must end with `@asu.edu`
+
+---
+
+## Common Issues
+
+| Symptom | Fix |
+|---|---|
+| ❌ Flask fails to start | Use `py -3.12 app.py` — `python` may point to a different version |
+| ❌ Login returns 500 | Backend is not running, or started with the wrong Python version |
+| ❌ Login returns "ASU email required" | Email must end with exactly `@asu.edu` |
+| ❌ Dashboard shows no events | Check Flask is running on port 5000 |
+| ❌ API not connecting | Vite proxies `/api` → `http://localhost:5000` — backend must be on port 5000 |
 
 ---
 

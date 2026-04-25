@@ -1,0 +1,26 @@
+{
+  "food_waste_cost_per_lb": {
+    "value": 1.84,
+    "source": "USDA ERS 2023"
+  },
+  "carbon_per_lb_food_waste_kg": {
+    "value": 0.37,
+    "source": "EPA WARM Model"
+  },
+  "space_cost_per_person": {
+    "value": 3.50,
+    "source": "ASU Event Services"
+  },
+  "staff_cost_per_person": {
+    "value": 2.00,
+    "source": "ASU Event Services"
+  },
+  "materials_cost_per_person": {
+    "value": 1.25,
+    "source": "ASU Event Services"
+  },
+  "food_waste_lbs_per_person": {
+    "value": 0.75,
+    "source": "USDA ERS 2023"
+  }
+}

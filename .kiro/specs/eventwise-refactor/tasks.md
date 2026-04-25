@@ -109,24 +109,24 @@ Goal: working organizer card + student calendar with no Flask, no API, no auth.
 
 Goal: replace mock data with real Flask backend.
 
-- [ ] 10. Flask project structure + baseline JSON
-  - [~] 10.1 Create Flask backend structure
+- [x] 10. Flask project structure + baseline JSON
+  - [x] 10.1 Create Flask backend structure
     - Create `app.py` (Flask app factory), `requirements.txt` (flask, flask-cors, pytest, hypothesis)
     - Create package directories: `services/`, `models/`, `routes/`, `data/`
     - Add `.env.example` with `FLASK_ENV`, `SECRET_KEY`
     - _Requirements: 7.1, 8.1, 9.4_
 
-  - [~] 10.2 Create `data/event_baselines.json`
+  - [x] 10.2 Create `data/event_baselines.json`
     - Write the JSON file with all six constants: `food_waste_cost_per_lb`, `carbon_per_lb_food_waste_kg`, `space_cost_per_person`, `staff_cost_per_person`, `materials_cost_per_person`, `food_waste_lbs_per_person`
     - Each entry must have `value` (positive float) and `source` (string) fields
     - _Requirements: 4.2, 8.1, 8.5_
 
-- [ ] 11. Python attendance engine
-  - [~] 11.1 Define `models/event.py` — Event and related dataclasses
+- [x] 11. Python attendance engine
+  - [x] 11.1 Define `models/event.py` — Event and related dataclasses
     - Implement `Event`, `AttendancePrediction`, `RiskFactor` dataclasses matching the design data models
     - _Requirements: 3.1, 3.3_
 
-  - [~] 11.2 Implement `services/attendance_engine.py`
+  - [x] 11.2 Implement `services/attendance_engine.py`
     - Port the same signal-weight logic from `attendanceEngine.js` to Python
     - Implement `compute_prediction(event)`, `classify_likelihood(predicted, signups)`, `compute_risk_factors(event)`, `get_signup_trend(event)`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
@@ -135,14 +135,14 @@ Goal: replace mock data with real Flask backend.
     - Test default ratio (0.65), each signal weight, clamping, likelihood thresholds
     - _Requirements: 3.2, 3.4, 3.5_
 
-- [ ] 12. Python waste/cost engine
-  - [~] 12.1 Implement `models/baselines.py` — Baseline_Store loader
+- [x] 12. Python waste/cost engine
+  - [x] 12.1 Implement `models/baselines.py` — Baseline_Store loader
     - Define `BaselineConstant` and `Baselines` dataclasses
     - Implement `load_baselines(path)` — reads JSON, validates all values are positive numbers, halts with logged error on missing file or invalid value
     - Expose `per_person_cost` property (`space + staff + materials = $6.75`)
     - _Requirements: 4.1, 8.2, 8.3, 8.4_
 
-  - [~] 12.2 Implement `services/waste_cost_engine.py`
+  - [x] 12.2 Implement `services/waste_cost_engine.py`
     - Implement `WasteInsight` dataclass in `models/waste.py`
     - Implement `compute_waste(event, prediction, baselines)` — same logic as JS util
     - Populate `sources` list from `BaselineConstant.source` fields
@@ -157,56 +157,56 @@ Goal: replace mock data with real Flask backend.
     - **Validates: Requirement 8.6**
     - Use `hypothesis` in `tests/test_baselines.py`
 
-- [ ] 13. Flask REST API routes
-  - [~] 13.1 Create seed event data in `data/events_seed.py`
+- [x] 13. Flask REST API routes
+  - [x] 13.1 Create seed event data in `data/events_seed.py`
     - Define 4–6 hardcoded `Event` objects (same scenarios as `mockEvents.js`)
     - This is the in-memory data store used by all event routes
     - _Requirements: 2.1, 3.1_
 
-  - [~] 13.2 Implement `GET /api/events` in `routes/events.py`
+  - [x] 13.2 Implement `GET /api/events` in `routes/events.py`
     - No auth guard yet (added in P2)
     - Accept optional `role` query param (`organizer` or `student`) and `email` query param for filtering
     - Return full `EventSummary` list with computed prediction and waste insight
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 6.1, 7.2_
 
-  - [~] 13.3 Implement `GET /api/events/{event_id}` in `routes/events.py`
+  - [x] 13.3 Implement `GET /api/events/{event_id}` in `routes/events.py`
     - Return full `EventSummary` plus `signal_breakdown` and `competing_events[]`
     - Return 404 if event not found
     - _Requirements: 7.3, 2.2, 3.1_
 
-  - [~] 13.4 Implement `POST /api/events/{event_id}/actions` in `routes/events.py`
+  - [x] 13.4 Implement `POST /api/events/{event_id}/actions` in `routes/events.py`
     - Accept `action_type` from request body
     - Return recommendation string based on action type and event data
     - "Reduce over-preparation" → "Prepare for {recommended_prep} instead of {rsvp_count} to save ${savings}."
     - _Requirements: 2.8, 2.9, 2.10, 2.11, 2.12, 7.4_
 
-  - [~] 13.5 Register blueprints in `app.py`, add CORS and global 500 handler
+  - [x] 13.5 Register blueprints in `app.py`, add CORS and global 500 handler
     - Wire `events` blueprint under `/api`
     - Add `@app.errorhandler(500)` returning JSON error envelope and logging error
     - Enable CORS for `http://localhost:5173`
     - _Requirements: 7.7, 7.8, 9.4_
 
-- [ ] 14. Vite proxy + replace frontend mock data with API calls
-  - [~] 14.1 Add `server.proxy` in `client/vite.config.js`
+- [x] 14. Vite proxy + replace frontend mock data with API calls
+  - [x] 14.1 Add `server.proxy` in `client/vite.config.js`
     - Proxy `/api` to `http://localhost:5000`
     - _Requirements: 7.1, 9.4_
 
-  - [~] 14.2 Implement `client/src/api/client.js`
+  - [x] 14.2 Implement `client/src/api/client.js`
     - Thin `fetch` wrapper; export `apiGet(path)`, `apiPost(path, body)`
     - No auth header yet (added in P2)
     - _Requirements: 7.2, 9.4_
 
-  - [~] 14.3 Replace mock data in `OrganizerDashboard.jsx` with `GET /api/events`
+  - [x] 14.3 Replace mock data in `OrganizerDashboard.jsx` with `GET /api/events`
     - Add loading skeleton (shadcn/ui `Skeleton`) while fetching
     - Add error state if fetch fails
     - Pass `role=organizer` and a hardcoded demo email as query params (no real auth yet)
     - _Requirements: 2.1, 7.2_
 
-  - [~] 14.4 Replace mock data in `StudentCalendar.jsx` with `GET /api/events`
+  - [x] 14.4 Replace mock data in `StudentCalendar.jsx` with `GET /api/events`
     - Pass `role=student` and a hardcoded demo student email as query params
     - _Requirements: 6.1, 7.2_
 
-  - [~] 14.5 Wire Quick_Action buttons in `EventCard.jsx` to `POST /api/events/{id}/actions`
+  - [x] 14.5 Wire Quick_Action buttons in `EventCard.jsx` to `POST /api/events/{id}/actions`
     - On click: call API, display returned `recommendation` string in a shadcn/ui `Alert` below the card
     - Show correct actions based on risk factors and no-show rate per requirements 2.9–2.12
     - _Requirements: 2.8, 2.9, 2.10, 2.11, 2.12_
@@ -220,8 +220,8 @@ Goal: replace mock data with real Flask backend.
 
 Goal: add login flow after core demo works.
 
-- [ ] 16. Auth_Service (Python)
-  - [~] 16.1 Implement `services/auth_service.py`
+- [x] 16. Auth_Service (Python)
+  - [x] 16.1 Implement `services/auth_service.py`
     - Implement `validate_email(email)`, `assign_role(email)`, `create_session(email, role)`, `get_session(token)`, `invalidate_session(token)`
     - Define `Session` dataclass in `models/session.py`
     - _Requirements: 1.1, 1.2, 1.3, 1.6, 1.7_
@@ -230,41 +230,41 @@ Goal: add login flow after core demo works.
     - Test non-`@asu.edu` rejection, role assignment, session lifecycle
     - _Requirements: 1.2, 1.3, 1.6, 1.7_
 
-- [ ] 17. POST /api/auth/login route
-  - [~] 17.1 Implement `routes/auth.py` — `POST /api/auth/login` and `POST /api/auth/logout`
+- [x] 17. POST /api/auth/login route
+  - [x] 17.1 Implement `routes/auth.py` — `POST /api/auth/login` and `POST /api/auth/logout`
     - Validate email, create session, return `{ status, data: { token, role }, error }`
     - Return 400 for invalid email format
     - Logout: invalidate session, return 200
     - _Requirements: 1.1, 1.2, 1.3, 7.1, 7.7_
 
-  - [~] 17.2 Implement auth middleware in `routes/middleware.py`
+  - [x] 17.2 Implement auth middleware in `routes/middleware.py`
     - `require_auth` decorator: reads `Authorization: Bearer <token>` header, returns 401 if missing/invalid
     - `require_role(role)` decorator: returns 403 if session role doesn't match
     - Apply decorators to all event routes
     - _Requirements: 1.6, 1.8, 7.5, 7.6_
 
-- [ ] 18. LoginPage (React)
-  - [~] 18.1 Implement `client/src/pages/LoginPage.jsx`
+- [x] 18. LoginPage (React)
+  - [x] 18.1 Implement `client/src/pages/LoginPage.jsx`
     - Single email input form using shadcn/ui `Input` and `Button`
     - On submit: call `POST /api/auth/login` via API client
     - On success: store token in `sessionStorage`, navigate to `/dashboard` (organizer) or `/calendar` (student)
     - On error: display inline error message
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 19. ProtectedRoute wrapper
-  - [~] 19.1 Add `ProtectedRoute` to `client/src/App.jsx`
+- [x] 19. ProtectedRoute wrapper
+  - [x] 19.1 Add `ProtectedRoute` to `client/src/App.jsx`
     - Reads token from sessionStorage; redirects to `/login` if absent
     - Add `/login` route → `LoginPage`
     - Wrap `/dashboard` and `/calendar` routes with `ProtectedRoute`
     - _Requirements: 1.4, 1.5, 1.8_
 
-  - [~] 19.2 Update `client/src/api/client.js` to attach Bearer token
+  - [x] 19.2 Update `client/src/api/client.js` to attach Bearer token
     - Attach `Authorization: Bearer <token>` from sessionStorage on every request
     - Global 401 handler: clear token, redirect to `/login`
     - _Requirements: 7.5, 9.4_
 
-- [ ] 20. Logout wiring
-  - [~] 20.1 Add logout button in dashboard and calendar headers
+- [x] 20. Logout wiring
+  - [x] 20.1 Add logout button in dashboard and calendar headers
     - On click: call `POST /api/auth/logout`, clear sessionStorage token, navigate to `/login`
     - _Requirements: 1.7_
 
@@ -277,26 +277,26 @@ Goal: add login flow after core demo works.
 
 Goal: production-ready demo quality.
 
-- [ ] 22. Global error toast
-  - [~] 22.1 Implement `client/src/components/ErrorToast.jsx`
+- [x] 22. Global error toast
+  - [x] 22.1 Implement `client/src/components/ErrorToast.jsx`
     - Use shadcn/ui `Toast`
     - Subscribe to error event dispatched by API client on 500 responses
     - Mount in `App.jsx`
     - _Requirements: 7.8_
 
-- [ ] 23. Loading skeletons
-  - [~] 23.1 Add shadcn/ui `Skeleton` loading states to `OrganizerDashboard.jsx` and `StudentCalendar.jsx`
+- [x] 23. Loading skeletons
+  - [x] 23.1 Add shadcn/ui `Skeleton` loading states to `OrganizerDashboard.jsx` and `StudentCalendar.jsx`
     - Show skeleton while API fetch is in flight
     - _Requirements: 2.1, 6.1_
 
-- [ ] 24. Baseline error handling end-to-end
-  - [~] 24.1 Verify Baseline_Store error handling
+- [x] 24. Baseline error handling end-to-end
+  - [x] 24.1 Verify Baseline_Store error handling
     - Confirm that if `data/event_baselines.json` is missing or has an invalid value, Flask logs the error and refuses to start
     - Confirm that `EventCard` displays "savings data unavailable" when the engine returns an error
     - _Requirements: 4.7, 5.6, 8.3, 8.4_
 
-- [ ] 25. Quick action handler polish
-  - [~] 25.1 Ensure all four Quick_Action types are wired and return correct recommendation strings
+- [x] 25. Quick action handler polish
+  - [x] 25.1 Ensure all four Quick_Action types are wired and return correct recommendation strings
     - "Adjust event timing", "Target a better audience", "Reduce over-preparation", "Increase outreach"
     - Verify correct actions surface based on risk factors per requirements 2.9–2.12
     - _Requirements: 2.8, 2.9, 2.10, 2.11, 2.12_

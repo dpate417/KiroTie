@@ -13,6 +13,14 @@ export default function WasteCostBanner({
   rsvpCount,
   sources = [],
 }) {
+  if (wastedCostUsd == null) {
+    return (
+      <div className="flex items-center gap-2 rounded-md bg-gray-50 border border-gray-200 px-3 py-2 text-sm text-gray-500">
+        Savings data unavailable
+      </div>
+    )
+  }
+
   if (overPrepGap === 0) {
     return (
       <div className="flex items-center gap-2 rounded-md bg-green-50 border border-green-200 px-3 py-2 text-sm text-green-700 font-medium">

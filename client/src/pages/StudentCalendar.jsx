@@ -1,6 +1,7 @@
-import { useState } from 'react'
-import mockEvents from '@/data/mockEvents'
-import { computePrediction, classifyLikelihood, computeRiskFactors } from '@/utils/attendanceEngine'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { apiGet, apiPost } from '@/api/client'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Sheet,
   SheetContent,
@@ -98,10 +99,63 @@ const LIKELIHOOD_BADGE = {
   Low:    'bg-red-100 text-red-800',
 }
 
+/** Map snake_case waste_insight from API to camelCase */
+function mapWasteInsight(wi) {
+  if (!wi) return {}
+  return {
+    overPrepGap:          wi.over_prep_gap,
+    wastedCostUsd:        wi.wasted_cost_usd,
+    recommendedPrep:      wi.recommended_prep,
+    savingsIfAdjustedUsd: wi.savings_if_adjusted_usd,
+    carbonSavingsKg:      wi.carbon_savings_kg,
+    perPersonCostUsd:     wi.per_person_cost_usd,
+    sources:              wi.sources ?? [],
+  }
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 export default function StudentCalendar() {
-  const [weekStart, setWeekStart]     = useState(() => getMondayOf(new Date()))
+  const [weekStart, setWeekStart]         = useState(() => getMondayOf(new Date()))
   const [selectedEvent, setSelectedEvent] = useState(null)
+  const [allEvents, setAllEvents]         = useState([])
+  const [loading, setLoading]             = useState(true)
+  const navigate                          = useNavigate()
+
+  function handleLogout() {
+    apiPost('/auth/logout', {}).catch(() => {})
+    sessionStorage.removeItem('token')
+    sessionStorage.removeItem('role')
+    navigate('/login')
+  }
+
+  useEffect(() => {
+    apiGet(`/events?role=student&email=${DEMO_STUDENT_EMAIL}`)
+      .then((res) => {
+        const data = res.data ?? res
+        if (!Array.isArray(data)) return
+        // Normalise API EventSummary into the shape the calendar expects
+        const mapped = data.map((summary) => ({
+          id:                  summary.id,
+          name:                summary.name,
+          date:                summary.date,
+          time:                summary.time,
+          location:            summary.location,
+          signup_count:        summary.signup_count,
+          // student calendar uses these directly
+          predicted:           summary.predicted_count,
+          likelihood:          summary.likelihood,
+          riskFactors:         summary.risk_factors ?? [],
+          wasteInsight:        mapWasteInsight(summary.waste_insight),
+          // keep for compatibility with any remaining references
+          registered_students: [DEMO_STUDENT_EMAIL],
+        }))
+        setAllEvents(mapped)
+      })
+      .catch(() => {
+        // silently fall back to empty — error handling can be added in P3
+      })
+      .finally(() => setLoading(false))
+  }, [])
 
   const weekDates       = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(weekStart)
@@ -110,18 +164,7 @@ export default function StudentCalendar() {
   })
   const weekDateStrings = weekDates.map(toDateString)
 
-  const studentEvents = mockEvents
-    .filter(
-      (e) =>
-        e.registered_students.includes(DEMO_STUDENT_EMAIL) &&
-        weekDateStrings.includes(e.date)
-    )
-    .map((e) => {
-      const predicted   = computePrediction(e)
-      const likelihood  = classifyLikelihood(predicted, e.signup_count)
-      const riskFactors = computeRiskFactors(e)
-      return { ...e, predicted, likelihood, riskFactors }
-    })
+  const studentEvents = allEvents.filter((e) => weekDateStrings.includes(e.date))
 
   const prevWeek = () => setWeekStart((p) => { const d = new Date(p); d.setDate(d.getDate() - 7); return d })
   const nextWeek = () => setWeekStart((p) => { const d = new Date(p); d.setDate(d.getDate() + 7); return d })
@@ -155,10 +198,44 @@ export default function StudentCalendar() {
           <button onClick={prevWeek} className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">← Prev</button>
           <span className="text-sm font-semibold text-gray-700 min-w-[180px] text-center">{weekLabel}</span>
           <button onClick={nextWeek} className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">Next →</button>
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            Log out
+          </button>
         </div>
       </div>
 
+      {/* ── Skeleton loading state ── */}
+      {loading && (
+        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+          {/* Day header skeleton */}
+          <div className="grid grid-cols-[56px_repeat(7,1fr)] border-b border-gray-200 p-2 gap-2">
+            <div />
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="flex flex-col items-center gap-1 py-1">
+                <Skeleton className="h-3 w-8" />
+                <Skeleton className="h-4 w-14" />
+              </div>
+            ))}
+          </div>
+          {/* Time slot rows skeleton */}
+          <div className="p-3 space-y-2">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="grid grid-cols-[56px_repeat(7,1fr)] gap-2 items-center">
+                <Skeleton className="h-3 w-10 ml-auto" />
+                {Array.from({ length: 7 }).map((_, j) => (
+                  <Skeleton key={j} className="h-12 w-full rounded" />
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* ── My Events summary panel ── */}
+      {!loading && (<>
       <div className="mb-4 flex flex-wrap gap-3 items-center">
         <div className="flex gap-3 flex-wrap">
           <div className="flex items-center gap-2 rounded-lg bg-blue-50 border border-blue-200 px-4 py-2">
@@ -335,6 +412,8 @@ export default function StudentCalendar() {
 
       {/* end two-column layout */}
       </div>
+      </>)}
+
       <Sheet open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
         <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
           {selectedEvent && (
