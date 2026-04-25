@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { apiGet, apiPost } from '@/api/client'
 import EventCard from '@/components/EventCard'
 import { Skeleton } from '@/components/ui/skeleton'
+import DashboardSidebar from '@/components/DashboardSidebar'
 
 /**
  * OrganizerDashboard — Req 2.1, 7.2
@@ -74,20 +75,11 @@ export default function OrganizerDashboard() {
   }, [])
 
   return (
-    <div
-      className="relative min-h-screen p-6"
-      style={{
-        backgroundImage: 'url(/images/org-dashboard-bg.png)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
-      }}
-    >
-      {/* White overlay for readability */}
-      <div className="absolute inset-0 bg-white/80" aria-hidden="true" />
-      <div className="relative z-10 max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen flex">
+      <DashboardSidebar onLogout={handleLogout} activePath="/dashboard" />
+
+      <main className="flex-1 p-6 overflow-y-auto">
+        <div className="space-y-6">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Organizer Dashboard</h1>
             {!loading && !error && (
@@ -96,46 +88,40 @@ export default function OrganizerDashboard() {
               </p>
             )}
           </div>
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1.5 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-          >
-            Log out
-          </button>
+
+          {loading && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
+                  <Skeleton className="h-5 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                  <Skeleton className="h-16 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {error && (
+            <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+              Failed to load events: {error}
+            </div>
+          )}
+
+          {!loading && !error && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {items.map(({ event, prediction, wasteInsight }) => (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  prediction={prediction}
+                  wasteInsight={wasteInsight}
+                />
+              ))}
+            </div>
+          )}
         </div>
-
-        {loading && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
-                <Skeleton className="h-5 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-16 w-full" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {error && (
-          <div className="rounded-md bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-            Failed to load events: {error}
-          </div>
-        )}
-
-        {!loading && !error && (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map(({ event, prediction, wasteInsight }) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                prediction={prediction}
-                wasteInsight={wasteInsight}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   )
 }
