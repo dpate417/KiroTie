@@ -26,7 +26,6 @@ export default function DashboardSidebar({ onLogout, activePath }) {
 
   const navItems = [
     { label: 'Dashboard', path: '/dashboard' },
-    { label: 'Events', path: '/events' },
     { label: 'Add Event (Manual)', path: '/add-event' },
   ]
 

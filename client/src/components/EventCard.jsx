@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Mail } from 'lucide-react'
 import { apiPost } from '@/api/client'
 
 const TREND_STYLES = {
@@ -71,6 +72,12 @@ export default function EventCard({ event, prediction, wasteInsight }) {
   const [actionResult, setActionResult] = useState(null)
   const [actionError, setActionError]   = useState(null)
   const [pendingAction, setPendingAction] = useState(null)
+  const [emailToast, setEmailToast] = useState(false)
+
+  function handleEmailOutreach() {
+    setEmailToast(true)
+    setTimeout(() => setEmailToast(false), 3000)
+  }
 
   const formattedDate = date
     ? new Date(date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
@@ -192,21 +199,34 @@ export default function EventCard({ event, prediction, wasteInsight }) {
 
         {/* ── 5. Action buttons ── */}
         {quickActions.length > 0 && (
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            {quickActions.map(({ label, hint, actionType, primary }) => (
+          <div className="space-y-2 pt-1">
+            <div className="grid grid-cols-2 gap-2">
+              {quickActions.map(({ label, hint, actionType, primary }) => (
+                <button
+                  key={actionType}
+                  onClick={() => handleAction(actionType)}
+                  disabled={pendingAction === actionType}
+                  className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors disabled:opacity-50 focus:outline-none ${
+                    primary
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'border border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
+                  }`}
+                >
+                  {pendingAction === actionType ? 'Loading…' : `${label} ${hint}`}
+                </button>
+              ))}
+            </div>
+
+            {/* Email outreach — demo only, no API call */}
+            {quickActions.some((a) => a.actionType === 'increase_outreach') && (
               <button
-                key={actionType}
-                onClick={() => handleAction(actionType)}
-                disabled={pendingAction === actionType}
-                className={`rounded-xl px-3 py-2 text-sm font-semibold transition-colors disabled:opacity-50 focus:outline-none ${
-                  primary
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'border border-gray-200 bg-white hover:bg-gray-50 text-gray-700'
-                }`}
+                onClick={handleEmailOutreach}
+                className="w-full flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium border border-gray-200 bg-white hover:bg-gray-50 text-gray-600 transition-colors focus:outline-none"
               >
-                {pendingAction === actionType ? 'Loading…' : `${label} ${hint}`}
+                <Mail className="h-3.5 w-3.5" />
+                Email potential students
               </button>
-            ))}
+            )}
           </div>
         )}
 
@@ -220,6 +240,16 @@ export default function EventCard({ event, prediction, wasteInsight }) {
         {actionError && (
           <Alert className="border-red-200 bg-red-50 text-red-700 rounded-xl">
             <AlertDescription className="text-sm">{actionError}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* ── Email outreach demo toast ── */}
+        {emailToast && (
+          <Alert className="border-blue-200 bg-blue-50 text-blue-800 rounded-xl">
+            <AlertDescription className="text-sm flex items-center gap-1.5">
+              <Mail className="h-3.5 w-3.5 shrink-0" />
+              Email already being sent.
+            </AlertDescription>
           </Alert>
         )}
 
