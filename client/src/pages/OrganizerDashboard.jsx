@@ -74,8 +74,19 @@ export default function OrganizerDashboard() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div
+      className="relative min-h-screen p-6"
+      style={{
+        backgroundImage: 'url(/images/org-dashboard-bg.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      {/* White overlay for readability */}
+      <div className="absolute inset-0 bg-white/80" aria-hidden="true" />
+      <div className="relative z-10 max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">Organizer Dashboard</h1>
