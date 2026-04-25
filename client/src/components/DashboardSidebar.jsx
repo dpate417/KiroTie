@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 
 const INTEGRATIONS = [
@@ -21,10 +22,12 @@ function StatusBadge({ status }) {
 }
 
 export default function DashboardSidebar({ onLogout, activePath }) {
+  const navigate = useNavigate()
+
   const navItems = [
     { label: 'Dashboard', path: '/dashboard' },
     { label: 'Events', path: '/events' },
-    { label: 'Add Event (Manual)', path: null },
+    { label: 'Add Event (Manual)', path: '/add-event' },
   ]
 
   return (
@@ -41,7 +44,10 @@ export default function DashboardSidebar({ onLogout, activePath }) {
           return (
             <div
               key={label}
-              className={`px-3 py-2 rounded-md text-sm font-medium cursor-default select-none ${
+              onClick={() => path && navigate(path)}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                path ? 'cursor-pointer' : 'cursor-default select-none'
+              } ${
                 isActive
                   ? 'bg-gray-100 text-gray-900 font-semibold'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
