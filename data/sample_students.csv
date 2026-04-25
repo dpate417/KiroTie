@@ -1,0 +1,11 @@
+student_name,email,major,events_attended,events_registered,events_missed,avg_registration_days_before,interest_tags
+Dhruv Patel,dpate417@asu.edu,Computer Science,8,10,2,1.5,"engineering,career,technology"
+Sarah Johnson,dpate417@asu.edu,Computer Science,12,13,1,0.5,"cybersecurity,technology,AI"
+Marcus Lee,dpate417@asu.edu,Business,4,9,5,12.0,"networking,career,business"
+Priya Sharma,dpate417@asu.edu,Data Science,10,11,1,2.0,"data science,AI,machine learning"
+Alex Rivera,dpate417@asu.edu,Psychology,2,8,6,18.0,"social events,wellness"
+Jordan Kim,dpate417@asu.edu,Engineering,7,8,1,1.0,"engineering,sustainability,research"
+Maya Patel,dpate417@asu.edu,Computer Science,6,7,1,3.0,"startup,entrepreneurship,technology"
+Chris Wong,dpate417@asu.edu,Finance,3,7,4,14.0,"career,finance,networking"
+Aisha Brown,dpate417@asu.edu,Biology,9,10,1,2.5,"research,science,sustainability"
+Tyler Davis,dpate417@asu.edu,Art,1,6,5,20.0,"culture,diversity,arts"
